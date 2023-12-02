@@ -2,9 +2,7 @@
 File for the chess board class.
 """
 
-from pieces.piece import Piece
-
-
+from pieces import *
 class Board:
     def __init__(self) -> None:
         self.dimensions =  (8, 8)
