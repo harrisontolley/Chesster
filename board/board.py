@@ -2,7 +2,7 @@
 File for the chess board class.
 """
 
-from pieces import *
+from pieces.pieces import *
 class Board:
     def __init__(self) -> None:
         self.dimensions =  (8, 8)
@@ -22,3 +22,12 @@ class Board:
     
     def __str__(self) -> str:
         pass
+
+    def get_king(self, colour) -> "King":
+        """
+        Returns the king of the given colour.
+        """
+        for piece in self.piece_array:
+            if isinstance(piece, King) and piece.get_colour() == colour:
+                return piece
+        return None # This should never happen, but just in case

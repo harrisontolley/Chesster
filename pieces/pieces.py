@@ -13,7 +13,14 @@ class Piece:
         self.valid_moves = self.get_valid_moves()
 
     def move(self, new_coords) -> None:
-        raise NotImplementedError
+        """
+        Moves the pawn to the new coordinates, if coordinates are valid.
+        """
+        if new_coords in self.valid_moves:
+            self.coords = new_coords
+            self.valid_moves = self.get_valid_moves()
+        else:
+            raise InvalidMove("Invalid move.")
 
     def get_valid_moves(self) -> list:
         raise NotImplementedError
@@ -29,18 +36,6 @@ class Pawn(Piece):
     def __init__(self, coords, board, colour="White" or "Black") -> None:
         super().__init__(coords, board, colour)
     
-    def move(self, new_coords) -> None:
-        """
-        Moves the pawn to the new coordinates, if coordinates are valid.
-        """
-        # ! ATM this doesnt account for possible piece taking
-
-        if new_coords in self.valid_moves:
-            self.coords = new_coords
-            self.valid_moves = self.get_valid_moves()
-        else:
-            raise InvalidMove("Invalid move for pawn.")
-        
     def get_valid_moves(self) -> list:
         """
         Gets valid moves for the pawn, this includes the coordinates it can move to and the coordinates it can take a piece at.
@@ -77,3 +72,98 @@ class Pawn(Piece):
 
         return valid_moves
 
+class Knight(Piece):
+    def __init__(self, coords, board, colour="White") -> None:
+        super().__init__(coords, board, colour)
+    
+    def get_valid_moves(self) -> list:
+        delta_x = [-2, -1, 1, 2, 2, 1, -1, -2]
+        delta_y = [1, 2, 2, 1, -1, -2, -2, -1]
+        valid_moves = []
+
+        for i in range(8):
+            new_x = self.coords[0] + delta_x[i]
+            new_y = self.coords[1] + delta_y[i]
+            if 0 <= new_x <= 7 and 0 <= new_y <= 7:
+                if not self.board.is_piece_at_coords((new_x, new_y)):
+                    valid_moves.append((new_x, new_y))
+                else:
+                    if self.board.piece_at_coords((new_x, new_y)).get_colour() != self.colour:
+                        valid_moves.append((new_x, new_y))
+
+class Bishop(Piece):
+    def __init__(self, coords, board, colour="White") -> None:
+        super().__init__(coords, board, colour)
+    
+    def get_valid_moves(self) -> list:
+        """
+        Gets the valid moves for a bishop to move to.
+        """
+        valid_moves = []
+        directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]
+        for direction in directions:
+            pos = self.coords
+            while 0 <= pos[0] < 8 and 0 <= pos[1] < 8:
+                pos = (pos[0] + direction[0], pos[1] + direction[1])
+                if self.board.is_piece_at_coords(pos):
+                    if self.board.piece_at_coords(pos).get_colour() != self.colour:
+                        valid_moves.append(pos)
+                    break
+                valid_moves.append(pos)
+        return valid_moves
+
+class Queen(Piece):
+    def __init__(self, coords, board, colour="White") -> None:
+        super().__init__(coords, board, colour)
+
+    def get_valid_moves(self) -> list:
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]
+        for direction in directions:
+            pos = self.coords
+            while 0 <= pos[0] < 8 and 0 <= pos[1] < 8:
+                pos = (pos[0] + direction[0], pos[1] + direction[1])
+                if self.board.is_piece_at_coords(pos):
+                    if self.board.piece_at_coords(pos).get_colour() != self.colour:
+                        self.valid_moves.append(pos)
+                    break
+                self.valid_moves.append(pos)
+
+class Rook(Piece):
+    def __init__(self, coords, board, colour="White") -> None:
+        super().__init__(coords, board, colour)
+    
+    def get_valid_moves(self) -> list:
+        """
+        Gets the valid moves for a rook to move to. This includes castling.
+        """
+        # ! NEED TO IMPLEMENT CASTLING
+        valid_moves = []
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        for direction in directions:
+            pos = self.coords
+            while 0 <= pos[0] < 8 and 0 <= pos[1] < 8:
+                pos = (pos[0] + direction[0], pos[1] + direction[1])
+                if self.board.is_piece_at_coords(pos):
+                    if self.board.piece_at_coords(pos).get_colour() != self.colour:
+                        valid_moves.append(pos)
+                    break
+                valid_moves.append(pos)
+        return valid_moves
+
+class King(Piece):
+    def __init__(self, coords, board, colour="White") -> None:
+        super().__init__(coords, board, colour)
+    
+    def get_valid_moves(self) -> list:
+        """
+        Gets the valid moves for a king to move to. This includes castling.
+        """
+        # ! NEED TO IMPLEMENT CASTLING
+        valid_moves = []
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, 1), (1, -1), (-1, -1)]
+        for direction in directions:
+            pos = (self.coords[0] + direction[0], self.coords[1] + direction[1])
+            if 0 <= pos[0] < 8 and 0 <= pos[1] < 8:
+                if not self.board.is_piece_at_coords(pos) or self.board.piece_at_coords(pos).get_colour() != self.colour:
+                    valid_moves.append(pos)
+        return valid_moves
