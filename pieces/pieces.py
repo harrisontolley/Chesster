@@ -44,6 +44,7 @@ class Pawn(Piece):
         # we can move forward 2, if there is no piece in front of us and we are in our starting position    
         # we can take a piece diagonally in front of us, if there is a piece there and it is of the opposite colour
         # have to also check pawn is not at the edge of the board
+        # ! NEED TO ADD EN PASSANT
         valid_moves = []
         forward_direction = 1 if self.colour == "White" else -1
 
