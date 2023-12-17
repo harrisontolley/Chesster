@@ -84,14 +84,18 @@ class ChessGUI:
             self.selected_piece = (index, self.board.Square[index])
             self.selected_square = (rank, file)  # Set selected_square here
         else:
-            # Move the piece to the new square
-            self.board.Square[self.selected_piece[0]] = Piece.NONE
-            self.board.Square[index] = self.selected_piece[1]
-            self.selected_piece = None
-            self.selected_square = None
-            # Switch the turn
-            self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
-
+            if self.selected_square == (rank, file):  # If the selected piece is clicked again, deselect it
+                self.selected_piece = None
+                self.selected_square = None
+            else:
+                # Move the piece to the new square
+                self.board.Square[self.selected_piece[0]] = Piece.NONE
+                self.board.Square[index] = self.selected_piece[1]
+                self.selected_piece = None
+                self.selected_square = None
+                # Switch the turn
+                self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+        print()
         self.draw_board()
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
