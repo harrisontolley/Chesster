@@ -11,7 +11,7 @@ class ChessGUI:
         self.board = board
         self.image_path = "chess/imgs/"
 
-        self.square_size = 100
+        self.square_size = 75
 
         self.canvas = Canvas(master, width=800, height=800)
         self.canvas.pack()
@@ -32,7 +32,7 @@ class ChessGUI:
             Piece.BLACK: 'b'
         }
 
-        valid_extensions = ('.png', '.jpg', '.jpeg', '.gif') 
+        valid_extensions = ('.png', '.jpg', '.jpeg') 
 
         for piece_type in range(1, 7):
             for color in [Piece.WHITE, Piece.BLACK]:
@@ -57,7 +57,6 @@ class ChessGUI:
                     color = "yellow" 
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
-
                 piece = self.board.Square[rank * 8 + file]
                 if piece != Piece.NONE:
                     piece_type = Piece.get_piece_type(piece)
@@ -66,16 +65,19 @@ class ChessGUI:
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
 
-
     def on_square_clicked(self, event):
         file = event.x // self.square_size
         rank = 7 - event.y // self.square_size
         index = rank * 8 + file
 
         if self.selected_piece is None:
+            if self.board.Square[index] == Piece.NONE:  # If the square is empty, do nothing
+                return
             self.selected_piece = (index, self.board.Square[index])
-            self.board.Square[index] = Piece.NONE
+            self.selected_square = (rank, file)  # Set selected_square here
         else:
+            # Move the piece to the new square
+            self.board.Square[self.selected_piece[0]] = Piece.NONE
             self.board.Square[index] = self.selected_piece[1]
             self.selected_piece = None
             self.selected_square = None
