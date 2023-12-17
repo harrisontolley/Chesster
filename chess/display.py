@@ -16,8 +16,13 @@ class ChessGUI:
         self.canvas = Canvas(master, width=800, height=800)
         self.canvas.pack()
 
+        self.selected_piece = None
+        self.selected_square = None
+
         self.load_piece_images()
         self.draw_board()
+
+        self.canvas.bind("<Button-1>", self.on_square_clicked)
 
     def load_piece_images(self):
         self.piece_images = {}
@@ -41,8 +46,6 @@ class ChessGUI:
                     # image = image.resize((self.square_size, self.square_size), Image.ANTIALIAS)
                     self.piece_images[piece] = ImageTk.PhotoImage(image)
 
-        print("Keys in piece_images:", self.piece_images.keys())
-
     def draw_board(self):
         for rank in range(8):
             for file in range(8):
@@ -50,17 +53,34 @@ class ChessGUI:
                 x1, y1 = x0 + self.square_size, y0 + self.square_size
 
                 color = "#FFFFFF" if (rank + file) % 2 == 0 else "green"
+                if self.selected_square is not None and self.selected_square == (rank, file):
+                    color = "yellow" 
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
+
 
                 piece = self.board.Square[rank * 8 + file]
                 if piece != Piece.NONE:
                     piece_type = Piece.get_piece_type(piece)
                     color = Piece.get_color(piece)
                     piece_key = Piece.create_piece(piece_type, color)
-                    print("Generated piece_key:", piece_key)
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
 
+
+    def on_square_clicked(self, event):
+        file = event.x // self.square_size
+        rank = 7 - event.y // self.square_size
+        index = rank * 8 + file
+
+        if self.selected_piece is None:
+            self.selected_piece = (index, self.board.Square[index])
+            self.board.Square[index] = Piece.NONE
+        else:
+            self.board.Square[index] = self.selected_piece[1]
+            self.selected_piece = None
+            self.selected_square = None
+
+        self.draw_board()
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 loaded_board = LoadPositionFromFen(starting_position)
