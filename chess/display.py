@@ -16,7 +16,7 @@ class ChessGUI:
         self.canvas = Canvas(master, 
         width=(400 * (self.square_size / 50)), 
         height=(400 * (self.square_size / 50)))
-        
+
         self.canvas.pack()
 
         self.selected_piece = None
@@ -26,6 +26,8 @@ class ChessGUI:
         self.draw_board()
 
         self.canvas.bind("<Button-1>", self.on_square_clicked)
+
+        self.current_turn = Piece.WHITE 
 
     def load_piece_images(self):
         self.piece_images = {}
@@ -76,6 +78,9 @@ class ChessGUI:
         if self.selected_piece is None:
             if self.board.Square[index] == Piece.NONE:  # If the square is empty, do nothing
                 return
+            # If it's not the turn of the piece's color, do nothing
+            if Piece.get_color(self.board.Square[index]) != self.current_turn:
+                return
             self.selected_piece = (index, self.board.Square[index])
             self.selected_square = (rank, file)  # Set selected_square here
         else:
@@ -84,6 +89,8 @@ class ChessGUI:
             self.board.Square[index] = self.selected_piece[1]
             self.selected_piece = None
             self.selected_square = None
+            # Switch the turn
+            self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
         self.draw_board()
 
