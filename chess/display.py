@@ -95,7 +95,7 @@ class ChessGUI:
                 self.selected_square = None
                 # Switch the turn
                 self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
-        print()
+        print(self.board)
         self.draw_board()
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"

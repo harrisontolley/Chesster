@@ -9,6 +9,15 @@ class Board:
     def __init__(self):
         self.Square[0] = Piece.WHITE | Piece.BISHOP
         self.Square[63] = Piece.BLACK | Piece.QUEEN
+    
+    def __str__(self):
+        board_str = ""
+        for rank in range(7, -1, -1):  # Start from the bottom rank
+            for file in range(8):
+                piece = self.Square[rank * 8 + file]
+                board_str += convert_piece_to_string(piece)
+            board_str += "\n"
+        return board_str
 
 
 def LoadPositionFromFen(fen):
