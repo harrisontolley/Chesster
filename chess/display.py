@@ -13,7 +13,10 @@ class ChessGUI:
 
         self.square_size = 75
 
-        self.canvas = Canvas(master, width=800, height=800)
+        self.canvas = Canvas(master, 
+        width=(400 * (self.square_size / 50)), 
+        height=(400 * (self.square_size / 50)))
+        
         self.canvas.pack()
 
         self.selected_piece = None
