@@ -46,18 +46,3 @@ def LoadPositionFromFen(fen):
             file += 1
 
     return board
-
-
-
-
-
-# Example usage:
-starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-loaded_board = LoadPositionFromFen(starting_position)
-
-# Print the loaded board
-for rank in range(7, -1, -1):
-    for file in range(8):
-        piece = loaded_board.Square[rank * 8 + file]
-        print(convert_piece_to_string(piece), end=" ")
-    print()

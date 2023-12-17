@@ -3,10 +3,7 @@ from tkinter import Canvas, PhotoImage
 from pieces import Piece, convert_piece_to_string
 from board import LoadPositionFromFen
 import os
-
-
-print("Current working directory:", os.getcwd())
-
+from PIL import Image, ImageTk
 
 class ChessGUI:
     def __init__(self, master, board):
@@ -14,7 +11,9 @@ class ChessGUI:
         self.board = board
         self.image_path = "chess/imgs/"
 
-        self.canvas = Canvas(master, width=400, height=400)
+        self.square_size = 100
+
+        self.canvas = Canvas(master, width=800, height=800)
         self.canvas.pack()
 
         self.load_piece_images()
@@ -36,22 +35,21 @@ class ChessGUI:
                 piece_char = convert_piece_to_string(piece)
                 image_name = color_table[Piece.get_color(piece)] + piece_char.lower()
                 image_path = f"{self.image_path}{image_name}.png"
-                print("Constructed image path:", image_path)
-                print("Image path:", image_path)
-                print("File exists:", os.path.exists(image_path))
-                print("Valid extension:", image_path.lower().endswith(valid_extensions))
-
                 if os.path.exists(image_path) and image_path.lower().endswith(valid_extensions):
-                    self.piece_images[piece] = PhotoImage(file=image_path)
+                    image = Image.open(image_path)
+                    image = image.resize((self.square_size, self.square_size))
+                    # image = image.resize((self.square_size, self.square_size), Image.ANTIALIAS)
+                    self.piece_images[piece] = ImageTk.PhotoImage(image)
+
         print("Keys in piece_images:", self.piece_images.keys())
 
     def draw_board(self):
         for rank in range(8):
             for file in range(8):
-                x0, y0 = file * 50, (7 - rank) * 50
-                x1, y1 = x0 + 50, y0 + 50
+                x0, y0 = file * self.square_size, (7 - rank) * self.square_size
+                x1, y1 = x0 + self.square_size, y0 + self.square_size
 
-                color = "white" if (rank + file) % 2 == 0 else "black"
+                color = "#FFFFFF" if (rank + file) % 2 == 0 else "green"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
                 piece = self.board.Square[rank * 8 + file]
@@ -61,7 +59,7 @@ class ChessGUI:
                     piece_key = Piece.create_piece(piece_type, color)
                     print("Generated piece_key:", piece_key)
                     image = self.piece_images[piece_key]
-                    self.canvas.create_image(x0 + 25, y0 + 25, image=image)
+                    self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
 
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
