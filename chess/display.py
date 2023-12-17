@@ -21,11 +21,14 @@ class ChessGUI:
 
         self.selected_piece = None
         self.selected_square = None
+        self.original_square = None
 
         self.load_piece_images()
         self.draw_board()
 
         self.canvas.bind("<Button-1>", self.on_square_clicked)
+        self.canvas.bind("<B1-Motion>", self.on_piece_dragged)
+        self.canvas.bind("<ButtonRelease-1>", self.on_piece_dropped)
 
         self.current_turn = Piece.WHITE 
 
@@ -58,7 +61,7 @@ class ChessGUI:
                 x1, y1 = x0 + self.square_size, y0 + self.square_size
 
                 color = "#FFFFFF" if (rank + file) % 2 == 0 else "green"
-                if self.selected_square is not None and self.selected_square == (rank, file):
+                if self.original_square is not None and self.original_square == (rank, file):  # Use original_square here
                     color = "yellow" 
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
@@ -83,19 +86,39 @@ class ChessGUI:
                 return
             self.selected_piece = (index, self.board.Square[index])
             self.selected_square = (rank, file)  # Set selected_square here
+            self.original_square = self.selected_square  # Store the original square
+            self.selected_piece_image = self.canvas.create_image(event.x, event.y, image=self.piece_images[self.selected_piece[1]])
         else:
             if self.selected_square == (rank, file):  # If the selected piece is clicked again, deselect it
                 self.selected_piece = None
                 self.selected_square = None
+                self.original_square = None  # Clear the original square
+                self.canvas.delete(self.selected_piece_image)
+                self.selected_piece_image = None
             else:
-                # Move the piece to the new square
-                self.board.Square[self.selected_piece[0]] = Piece.NONE
-                self.board.Square[index] = self.selected_piece[1]
-                self.selected_piece = None
-                self.selected_square = None
-                # Switch the turn
-                self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
-        print(self.board)
+                self.move_piece(index)
+    
+    def on_piece_dragged(self, event):
+        if self.selected_piece is not None:
+            self.canvas.coords(self.selected_piece_image, event.x, event.y)
+
+    def on_piece_dropped(self, event):
+        if self.selected_piece is not None:
+            file = event.x // self.square_size
+            rank = 7 - event.y // self.square_size
+            index = rank * 8 + file
+            self.move_piece(index)
+
+    def move_piece(self, index):
+        # Move the piece to the new square
+        self.board.Square[self.selected_piece[0]] = Piece.NONE
+        self.board.Square[index] = self.selected_piece[1]
+        self.selected_piece = None
+        self.selected_square = None
+        self.canvas.delete(self.selected_piece_image)
+        self.selected_piece_image = None
+        # Switch the turn
+        self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
         self.draw_board()
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
