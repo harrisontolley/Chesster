@@ -85,7 +85,7 @@ class ChessGUI:
             self.board.move_piece(index)
             self.draw_board()
             print(self.board.get_fen())
-            print(self.board.get_valid_moves(Piece.WHITE))
+            print(self.board.get_valid_moves(self.board.current_turn))
 
 # starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 test = "8/8/8/3p3p/8/8/8/B7"
