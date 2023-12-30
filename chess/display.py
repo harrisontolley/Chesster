@@ -85,9 +85,11 @@ class ChessGUI:
             self.board.move_piece(index)
             self.draw_board()
             print(self.board.get_fen())
+            print(self.board.get_valid_moves(Piece.WHITE))
 
-starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-loaded_board = LoadPositionFromFen(starting_position)
+# starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+test = "8/8/8/3p3p/8/8/8/B7"
+loaded_board = LoadPositionFromFen(test)
 
 root = tk.Tk()
 root.title("Chess GUI")
