@@ -71,8 +71,206 @@ class Board:
             if rank < 7:
                 fen += "/"
         return fen
+    
+    def get_valid_moves(self, colour_to_move):
+        moves = []
+        for rank in range(8):
+            for file in range(8):
+                piece = self.Square[rank * 8 + file]
+                if Piece.get_color(piece) == colour_to_move:
+                    moves += self.get_piece_moves(piece, rank, file)
+        return moves
 
-
+    def get_piece_moves(self, piece, rank, file):
+        piece_type = Piece.get_piece_type(piece)
+        color = Piece.get_color(piece)
+        if piece_type == Piece.PAWN:
+            return self.get_pawn_moves(piece, rank, file)
+        elif piece_type == Piece.KNIGHT:
+            return self.get_knight_moves(piece, rank, file)
+        elif piece_type == Piece.BISHOP:
+            return self.get_bishop_moves(piece, rank, file)
+        elif piece_type == Piece.ROOK:
+            return self.get_rook_moves(piece, rank, file)
+        elif piece_type == Piece.QUEEN:
+            return self.get_queen_moves(piece, rank, file)
+        elif piece_type == Piece.KING:
+            return self.get_king_moves(piece, rank, file)
+        return []
+    
+    def get_pawn_moves(self, piece, rank, file):
+        moves = []
+        color = Piece.get_color(piece)
+        direction = 1 if color == Piece.WHITE else -1
+        if rank + direction in range(8) and self.Square[(rank + direction) * 8 + file] == Piece.NONE:
+            moves.append((rank + direction, file))
+            if (rank == 1 and color == Piece.WHITE) or (rank == 6 and color == Piece.BLACK):
+                if self.Square[(rank + 2 * direction) * 8 + file] == Piece.NONE:
+                    moves.append((rank + 2 * direction, file))
+        if rank + direction in range(8) and file - 1 in range(8) and self.Square[(rank + direction) * 8 + file - 1] != Piece.NONE and Piece.get_color(self.Square[(rank + direction) * 8 + file - 1]) != color:
+            moves.append((rank + direction, file - 1))
+        if rank + direction in range(8) and file + 1 in range(8) and self.Square[(rank + direction) * 8 + file + 1] != Piece.NONE and Piece.get_color(self.Square[(rank + direction) * 8 + file + 1]) != color:
+            moves.append((rank + direction, file + 1))
+        return moves
+    
+    def get_knight_moves(self, piece, rank, file):
+        moves = []
+        color = Piece.get_color(piece)
+        for i in range(-2, 3):
+            for j in range(-2, 3):
+                if abs(i) + abs(j) == 3:
+                    if rank + i in range(8) and file + j in range(8):
+                        if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) != color:
+                            moves.append((rank + i, file + j))
+        return moves
+    
+    def get_bishop_moves(self, piece, rank, file):
+        moves = []
+        color = Piece.get_color(piece)
+        for i in range(1, 8):
+            if rank + i in range(8) and file + i in range(8):
+                if self.Square[(rank + i) * 8 + file + i] == Piece.NONE:
+                    moves.append((rank + i, file + i))
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file + i]) != color:
+                    moves.append((rank + i, file + i))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if rank - i in range(8) and file + i in range(8):
+                if self.Square[(rank - i) * 8 + file + i] == Piece.NONE:
+                    moves.append((rank - i, file + i))
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file + i]) != color:
+                    moves.append((rank - i, file + i))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if rank + i in range(8) and file - i in range(8):
+                if self.Square[(rank + i) * 8 + file - i] == Piece.NONE:
+                    moves.append((rank + i, file - i))
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file - i]) != color:
+                    moves.append((rank + i, file - i))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if rank - i in range(8) and file - i in range(8):
+                if self.Square[(rank - i) * 8 + file - i] == Piece.NONE:
+                    moves.append((rank - i, file - i))
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file - i]) != color:
+                    moves.append((rank - i, file - i))
+                    break
+                else:
+                    break
+        return moves
+    
+    def get_rook_moves(self, piece, rank, file):
+        moves = []
+        color = Piece.get_color(piece)
+        for i in range(1, 8):
+            if rank + i in range(8):
+                if self.Square[(rank + i) * 8 + file] == Piece.NONE:
+                    moves.append((rank + i, file))
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file]) != color:
+                    moves.append((rank + i, file))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if rank - i in range(8):
+                if self.Square[(rank - i) * 8 + file] == Piece.NONE:
+                    moves.append((rank - i, file))
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file]) != color:
+                    moves.append((rank - i, file))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if file + i in range(8):
+                if self.Square[rank * 8 + file + i] == Piece.NONE:
+                    moves.append((rank, file + i))
+                elif Piece.get_color(self.Square[rank * 8 + file + i]) != color:
+                    moves.append((rank, file + i))
+                    break
+                else:
+                    break
+        for i in range(1, 8):
+            if file - i in range(8):
+                if self.Square[rank * 8 + file - i] == Piece.NONE:
+                    moves.append((rank, file - i))
+                elif Piece.get_color(self.Square[rank * 8 + file - i]) != color:
+                    moves.append((rank, file - i))
+                    break
+                else:
+                    break
+        return moves
+    
+    def get_queen_moves(self, piece, rank, file):
+        moves = []
+        moves += self.get_bishop_moves(piece, rank, file)
+        moves += self.get_rook_moves(piece, rank, file)
+        return moves
+    
+    def get_king_moves(self, piece, rank, file):
+        moves = []
+        color = Piece.get_color(piece)
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if rank + i in range(8) and file + j in range(8):
+                    if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) != color:
+                        moves.append((rank + i, file + j))
+        return moves
+    
+    def is_in_check(self, color):
+        for rank in range(8):
+            for file in range(8):
+                piece = self.Square[rank * 8 + file]
+                if Piece.get_color(piece) != color:
+                    continue
+                moves = self.get_piece_moves(piece, rank, file)
+                for move in moves:
+                    if self.Square[move[0] * 8 + move[1]] == Piece.create_piece(Piece.KING, color):
+                        return True
+        return False
+    
+    def is_in_checkmate(self, color):
+        if not self.is_in_check(color):
+            return False
+        for rank in range(8):
+            for file in range(8):
+                piece = self.Square[rank * 8 + file]
+                if Piece.get_color(piece) != color:
+                    continue
+                moves = self.get_piece_moves(piece, rank, file)
+                for move in moves:
+                    board_copy = Board()
+                    board_copy.Square = self.Square.copy()
+                    board_copy.move_piece(move[0] * 8 + move[1])
+                    if not board_copy.is_in_check(color):
+                        return False
+        return True
+    
+    def is_in_stalemate(self, color):
+        if self.is_in_check(color):
+            return False
+        for rank in range(8):
+            for file in range(8):
+                piece = self.Square[rank * 8 + file]
+                if Piece.get_color(piece) != color:
+                    continue
+                moves = self.get_piece_moves(piece, rank, file)
+                for move in moves:
+                    board_copy = Board()
+                    board_copy.Square = self.Square.copy()
+                    board_copy.move_piece(move[0] * 8 + move[1])
+                    if not board_copy.is_in_check(color):
+                        return False
+        return True
+    
+    def is_draw(self):
+        return self.is_in_stalemate(Piece.WHITE) or self.is_in_stalemate(Piece.BLACK) or self.is_in_checkmate(Piece.WHITE) or self.is_in_checkmate(Piece.BLACK)
+    
 def LoadPositionFromFen(fen):
     board = Board()
     rank, file = 7, 0  # Start from the top-left corner of the board
