@@ -74,7 +74,7 @@ class ChessGUI:
                     piece_key = Piece.create_piece(piece_type, color)
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
-                    
+
     def on_square_clicked(self, event):
         file = event.x // self.square_size
         rank = 7 - event.y // self.square_size
@@ -128,6 +128,27 @@ class ChessGUI:
         # Switch the turn
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
         self.draw_board()
+        print(self.get_fen())
+    
+    def get_fen(self):
+        fen = ""
+        empty_count = 0
+        for rank in range(8):
+            for file in range(8):
+                piece = self.board.Square[rank * 8 + file]
+                if piece == Piece.NONE:
+                    empty_count += 1
+                else:
+                    if empty_count > 0:
+                        fen += str(empty_count)
+                        empty_count = 0
+                    fen += convert_piece_to_string(piece)
+            if empty_count > 0:
+                fen += str(empty_count)
+                empty_count = 0
+            if rank < 7:
+                fen += "/"
+        return fen
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 loaded_board = LoadPositionFromFen(starting_position)
