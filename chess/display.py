@@ -22,6 +22,7 @@ class ChessGUI:
         self.selected_piece = None
         self.selected_square = None
         self.original_square = None
+        self.destination_square = None
 
         self.load_piece_images()
         self.draw_board()
@@ -61,8 +62,9 @@ class ChessGUI:
                 x1, y1 = x0 + self.square_size, y0 + self.square_size
 
                 color = "#FFFFFF" if (rank + file) % 2 == 0 else "green"
-                if self.original_square is not None and self.original_square == (rank, file):  # Use original_square here
-                    color = "yellow" 
+                # if (self.original_square is not None and self.original_square == (rank, file)) or \
+                # (self.destination_square is not None and self.destination_square == (rank, file)):
+                #     color = "yellow" 
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
                 piece = self.board.Square[rank * 8 + file]
@@ -72,7 +74,7 @@ class ChessGUI:
                     piece_key = Piece.create_piece(piece_type, color)
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
-
+                    
     def on_square_clicked(self, event):
         file = event.x // self.square_size
         rank = 7 - event.y // self.square_size
@@ -93,6 +95,7 @@ class ChessGUI:
                 self.selected_piece = None
                 self.selected_square = None
                 self.original_square = None  # Clear the original square
+                self.destination_square = None  # Clear the destination square
                 self.canvas.delete(self.selected_piece_image)
                 self.selected_piece_image = None
             else:
@@ -110,10 +113,15 @@ class ChessGUI:
             self.move_piece(index)
 
     def move_piece(self, index):
+        # Calculate the rank and file of the destination square
+        file = index % 8
+        rank = 7 - index // 8
+
         # Move the piece to the new square
         self.board.Square[self.selected_piece[0]] = Piece.NONE
         self.board.Square[index] = self.selected_piece[1]
         self.selected_piece = None
+        self.destination_square = (rank, file)  # Store the destination square
         self.selected_square = None
         self.canvas.delete(self.selected_piece_image)
         self.selected_piece_image = None
