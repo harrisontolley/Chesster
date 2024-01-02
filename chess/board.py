@@ -59,8 +59,8 @@ class Board:
 
     def get_fen(self):
         fen = ""
-        empty_count = 0
         for rank in range(8):
+            empty_count = 0
             for file in range(8):
                 piece = self.Square[rank * 8 + file]
                 if piece == Piece.NONE:
@@ -72,10 +72,13 @@ class Board:
                     fen += convert_piece_to_string(piece)
             if empty_count > 0:
                 fen += str(empty_count)
-                empty_count = 0
             if rank < 7:
                 fen += "/"
+        
+        active_color = 'w' if self.current_turn == Piece.WHITE else 'b'
+        fen += " " + active_color
         return fen
+
     
     def get_valid_moves(self, color_to_move):
         all_moves = self.generate_all_possible_moves(color_to_move)
@@ -394,12 +397,12 @@ class Board:
     
 def LoadPositionFromFen(fen):
     board = Board()
+    parts = fen.split()
+    piece_placement = parts[0]
+    active_color = parts[1]
+
     rank, file = 7, 0  # Start from the top-left corner of the board
-
-    for char in fen:
-        if char == ' ':
-            break  # Ignore the rest of the FEN string after the position part
-
+    for char in piece_placement:
         if char == '/':
             rank -= 1
             file = 0
@@ -407,23 +410,12 @@ def LoadPositionFromFen(fen):
             file += int(char)
         else:
             color = Piece.WHITE if char.isupper() else Piece.BLACK
-            piece_type = 0
-
-            char_lower = char.lower()
-            if char_lower == 'k':
-                piece_type = Piece.KING
-            elif char_lower == 'p':
-                piece_type = Piece.PAWN
-            elif char_lower == 'n':
-                piece_type = Piece.KNIGHT
-            elif char_lower == 'b':
-                piece_type = Piece.BISHOP
-            elif char_lower == 'r':
-                piece_type = Piece.ROOK
-            elif char_lower == 'q':
-                piece_type = Piece.QUEEN
-
+            piece_type = {
+                'P': Piece.PAWN, 'N': Piece.KNIGHT, 'B': Piece.BISHOP,
+                'R': Piece.ROOK, 'Q': Piece.QUEEN, 'K': Piece.KING
+            }.get(char.upper(), 0)
             board.Square[rank * 8 + file] = Piece.create_piece(piece_type, color)
             file += 1
 
+    board.current_turn = Piece.WHITE if active_color == 'w' else Piece.BLACK
     return board

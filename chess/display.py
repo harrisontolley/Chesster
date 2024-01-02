@@ -117,7 +117,7 @@ class ChessGUI:
             self.draw_board()
 
 
-starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p3p/8/8/8/B7"
 loaded_board = LoadPositionFromFen(starting_position)
 
