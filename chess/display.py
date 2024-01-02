@@ -82,14 +82,22 @@ class ChessGUI:
             file = event.x // self.square_size
             rank = 7 - event.y // self.square_size
             index = rank * 8 + file
-            self.board.move_piece(index)
-            self.draw_board()
-            print(self.board.get_fen())
-            print(self.board.get_valid_moves(self.board.current_turn))
+            piece_type = Piece.get_piece_type(self.board.selected_piece[1])
+            valid_moves = self.board.get_valid_moves(self.board.current_turn)
+            if index in valid_moves[piece_type]:
+                self.board.move_piece(index)
+                self.draw_board()
 
-# starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-test = "8/8/8/3p3p/8/8/8/B7"
-loaded_board = LoadPositionFromFen(test)
+                # error checking
+                print(self.board.get_fen())
+                print(self.board.get_valid_moves(self.board.current_turn))
+            else:
+                print("Invalid move. Please try again.")
+                self.draw_board()
+
+starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+# test = "8/8/8/3p3p/8/8/8/B7"
+loaded_board = LoadPositionFromFen(starting_position)
 
 root = tk.Tk()
 root.title("Chess GUI")
