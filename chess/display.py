@@ -42,7 +42,7 @@ class ChessGUI:
             for file in range(8):
                 x0, y0 = file * self.square_size, (7 - rank) * self.square_size
                 x1, y1 = x0 + self.square_size, y0 + self.square_size
-                color = "#FFFFFF" if (rank + file) % 2 == 0 else "green"
+                color = "#b4afa5" if (rank + file) % 2 == 0 else "#735438"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
                 piece = self.board.Square[rank * 8 + file]
                 if piece != Piece.NONE:
