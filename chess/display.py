@@ -25,21 +25,17 @@ class ChessGUI:
 
     def load_piece_images(self):
         self.piece_images = {}
-        color_table = {
-            Piece.WHITE: 'w',
-            Piece.BLACK: 'b'
-        }
-        valid_extensions = ('.png', '.jpg', '.jpeg') 
+        color_table = {Piece.WHITE: 'w', Piece.BLACK: 'b'}
         for piece_type in range(1, 7):
             for color in [Piece.WHITE, Piece.BLACK]:
                 piece = Piece.create_piece(piece_type, color)
                 piece_char = convert_piece_to_string(piece)
-                image_name = color_table[Piece.get_color(piece)] + piece_char.lower()
-                image_path = f"{self.image_path}{image_name}.png"
-                if os.path.exists(image_path) and image_path.lower().endswith(valid_extensions):
-                    image = Image.open(image_path)
-                    image = image.resize((self.square_size, self.square_size))
-                    self.piece_images[piece] = ImageTk.PhotoImage(image)
+                image_name = f"{color_table[color]}{piece_char.lower()}.png"
+                image_path = os.path.join(self.image_path, image_name)
+                if os.path.exists(image_path):
+                    self.piece_images[piece] = ImageTk.PhotoImage(
+                        Image.open(image_path).resize((self.square_size, self.square_size)))
+
 
     def draw_board(self):
         for rank in range(8):
