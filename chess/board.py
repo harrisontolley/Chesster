@@ -395,7 +395,7 @@ class Board:
     def is_draw(self):
         return self.is_in_stalemate(Piece.WHITE) or self.is_in_stalemate(Piece.BLACK) or self.is_in_checkmate(Piece.WHITE) or self.is_in_checkmate(Piece.BLACK)
     
-def LoadPositionFromFen(fen):
+def load_position_from_fen(fen):
     board = Board()
     parts = fen.split()
     piece_placement = parts[0]
