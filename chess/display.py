@@ -9,7 +9,7 @@ class ChessGUI:
     def __init__(self, master, board):
         self.master = master
         self.board = board
-        self.image_path = "chess/imgs/"
+        self.image_path = "imgs/"
         self.square_size = 75
         self.canvas = Canvas(master, 
         width=(400 * (self.square_size / 50)), 
