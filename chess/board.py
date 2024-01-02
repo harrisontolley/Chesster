@@ -51,6 +51,9 @@ class Board:
         self.selected_square = None
         # Switch the turn
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+        opponent_color = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+        if self.is_in_check(opponent_color):
+            print(f"Player with color {opponent_color} is in check.")
         print(self)
 
 
@@ -75,14 +78,124 @@ class Board:
         return fen
     
     def get_valid_moves(self, color_to_move):
+        all_moves = self.generate_all_possible_moves(color_to_move)
+        if self.is_in_check(color_to_move):
+            # Player is in check, filter moves to only those that can resolve the check
+            return self.filter_moves_to_resolve_check(all_moves, color_to_move)
+        else:
+            # Player is not in check, filter out moves that would put the player in check
+            return self.filter_moves_to_avoid_self_check(all_moves, color_to_move)
+
+    def generate_all_possible_moves(self, color):
         moves = {}
-        for rank in range(8):
-            for file in range(8):
-                index = rank * 8 + file
-                piece = self.Square[index]
-                if Piece.get_color(piece) == color_to_move:
-                    moves[index] = self.get_piece_moves(piece, rank, file)
+        for i, piece in enumerate(self.Square):
+            if Piece.get_color(piece) == color:
+                rank, file = 7 - i // 8, i % 8
+                moves[i] = self.get_piece_moves(piece, rank, file)
+        print("All possible moves: ", moves)
         return moves
+    
+    def filter_moves_to_resolve_check(self, moves, color):
+        valid_moves = {}
+        for from_index, to_moves in moves.items():
+            for move in to_moves:
+                to_index = move[0] * 8 + move[1]
+                if not self.simulate_move_and_check(from_index, to_index, color):
+                    valid_moves.setdefault(from_index, []).append(move)
+        return valid_moves
+
+    def filter_moves_to_avoid_self_check(self, moves, color):
+        valid_moves = {}
+        for from_index, to_moves in moves.items():
+            for move in to_moves:
+                to_index = move[0] * 8 + move[1]
+                if not self.simulate_move_and_check(from_index, to_index, color):
+                    valid_moves.setdefault(from_index, []).append(move)
+        return valid_moves
+
+    def simulate_move_and_check(self, from_index, to_index, color):
+        # Simulate the move
+        original_piece = self.Square[from_index]
+        captured_piece = self.Square[to_index]
+        self.Square[to_index] = original_piece
+        self.Square[from_index] = Piece.NONE
+
+        # Check for check status after the move
+        is_in_check_after_move = self.is_in_check(color)
+
+        # Revert the move
+        self.Square[from_index] = original_piece
+        self.Square[to_index] = captured_piece
+
+        return is_in_check_after_move
+    
+    def filter_moves_leading_to_self_check(self, moves, color):
+        """Filter out moves that would lead to self-check."""
+        valid_moves = {}
+        for from_index, to_moves in moves.items():
+            for move in to_moves:
+                to_index = move[0] * 8 + move[1]
+                if not self.move_simulate_and_check(from_index, to_index):
+                    valid_moves.setdefault(from_index, []).append(move)
+        return valid_moves
+
+    def filter_moves_in_check(self, moves, color):
+        """Return only moves that get the player out of check."""
+        valid_moves = {}
+        for from_index, to_moves in moves.items():
+            for move in to_moves:
+                to_index = move[0] * 8 + move[1]
+                if not self.move_simulate_and_check(from_index, to_index):
+                    valid_moves.setdefault(from_index, []).append(move)
+        return valid_moves
+    
+
+
+    def filter_check_moves(self, moves, color):
+        """Filters moves to only those that remove check."""
+        valid_moves = {}
+        for from_index, to_moves in moves.items():
+            valid_moves_for_piece = []
+            for move in to_moves:
+                to_index = move[0] * 8 + move[1]
+                if not self.move_simulate(from_index, to_index):
+                    valid_moves_for_piece.append(move)
+            if valid_moves_for_piece:
+                valid_moves[from_index] = valid_moves_for_piece
+        return valid_moves
+
+    def move_simulate(self, from_index, to_index):
+        """Simulates a move and checks if it results in the player being in check."""
+        # Store original state
+        original_piece = self.Square[from_index]
+        captured_piece = self.Square[to_index]
+        original_turn = self.current_turn
+
+        # Perform the move
+        self.Square[to_index] = original_piece
+        self.Square[from_index] = Piece.NONE
+
+        # Change turn to opponent's to check if the move results in a check
+        self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+        in_check = self.is_in_check(Piece.get_color(original_piece))
+
+        # Revert the move and turn
+        self.Square[from_index] = original_piece
+        self.Square[to_index] = captured_piece
+        self.current_turn = original_turn
+
+        return in_check
+    
+    def move_simulate_and_check(self, from_index, to_index):
+        """Simulate a move and check if it leads to self-check."""
+        piece = self.Square[from_index]
+        captured_piece = self.Square[to_index]
+        self.Square[to_index] = piece
+        self.Square[from_index] = Piece.NONE
+        in_check = self.is_in_check(Piece.get_color(piece))
+        self.Square[from_index] = piece
+        self.Square[to_index] = captured_piece
+        return in_check
 
     def get_piece_moves(self, piece, rank, file):
         piece_type = Piece.get_piece_type(piece)
@@ -226,15 +339,20 @@ class Board:
         return moves
     
     def is_in_check(self, color):
-        for rank in range(8):
-            for file in range(8):
-                piece = self.Square[rank * 8 + file]
-                if Piece.get_color(piece) != color:
-                    continue
-                moves = self.get_piece_moves(piece, rank, file)
-                for move in moves:
-                    if self.Square[move[0] * 8 + move[1]] == Piece.create_piece(Piece.KING, color):
-                        return True
+        # Find the king's position
+        king_position = None
+        for i, piece in enumerate(self.Square):
+            if Piece.get_piece_type(piece) == Piece.KING and Piece.get_color(piece) == color:
+                king_position = (7 - i // 8, i % 8)
+                break
+
+        # Check for threats to the king
+        opponent_color = Piece.BLACK if color == Piece.WHITE else Piece.BLACK
+        for i, piece in enumerate(self.Square):
+            if Piece.get_color(piece) == opponent_color:
+                moves = self.get_piece_moves(piece, 7 - i // 8, i % 8)
+                if king_position in [(move[0], move[1]) for move in moves]:
+                    return True
         return False
     
     def is_in_checkmate(self, color):
