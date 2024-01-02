@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Canvas, PhotoImage
 from pieces import Piece, convert_piece_to_string
-from board import LoadPositionFromFen
+from board import load_position_from_fen
 import os
 from PIL import Image, ImageTk
 
@@ -119,7 +119,7 @@ class ChessGUI:
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p3p/8/8/8/B7"
-loaded_board = LoadPositionFromFen(starting_position)
+loaded_board = load_position_from_fen(starting_position)
 
 root = tk.Tk()
 root.title("Chess GUI")
