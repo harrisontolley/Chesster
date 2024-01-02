@@ -12,13 +12,14 @@ class ChessGUI:
         self.image_path = "imgs/"
         self.square_size = 75
         self.canvas = Canvas(master, 
-        width=(400 * (self.square_size / 50)), 
-        height=(400 * (self.square_size / 50)))
+                             width=(400 * (self.square_size / 50)), 
+                             height=(400 * (self.square_size / 50)))
         self.canvas.pack()
         self.selected_piece_image = None
         self.load_piece_images()
         self.draw_board()
-        self.canvas.bind("<Button-1>", self.on_square_clicked)
+        # self.canvas.bind("<Button-1>", self.on_square_clicked)
+        self.canvas.bind("<Button-1>", self.on_piece_clicked)
         self.canvas.bind("<B1-Motion>", self.on_piece_dragged)
         self.canvas.bind("<ButtonRelease-1>", self.on_piece_dropped)
 
@@ -55,45 +56,70 @@ class ChessGUI:
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
 
-    def on_square_clicked(self, event):
+    # def on_square_clicked(self, event):
+    #     file = event.x // self.square_size
+    #     rank = 7 - event.y // self.square_size
+    #     index = rank * 8 + file
+    #     print(f"Clicked square index: {index}")
+    #     if self.board.selected_piece is None:
+    #         self.board.select_piece(index)
+    #         if self.board.selected_piece is not None:
+    #             self.selected_piece_image = self.canvas.create_image(event.x, event.y, image=self.piece_images[self.board.selected_piece[1]])
+    #     else:
+    #         target_square_index = rank * 8 + file
+    #         piece_type = Piece.get_piece_type(self.board.selected_piece[1])
+    #         valid_moves = self.board.get_valid_moves(self.board.current_turn)
+    #         print(f"Valid moves for piece: {valid_moves[piece_type]}")
+    #         if target_square_index in valid_moves[piece_type]:
+    #             print(f"Moving piece from {self.board.selected_piece[0]} to {target_square_index}")
+    #             self.board.move_piece(target_square_index)
+    #             self.draw_board()
+    #             print(self.board.get_fen())
+    #         else:
+    #             print("Invalid move.")
+    #             self.board.deselect_piece()
+    #             self.canvas.delete(self.selected_piece_image)
+    #             self.selected_piece_image = None
+    
+    def on_piece_clicked(self, event):
         file = event.x // self.square_size
         rank = 7 - event.y // self.square_size
         index = rank * 8 + file
-        if self.board.selected_piece is None:
-            self.board.select_piece(index)
-            if self.board.selected_piece is not None:
-                self.selected_piece_image = self.canvas.create_image(event.x, event.y, image=self.piece_images[self.board.selected_piece[1]])
+        piece = self.board.Square[index]
+
+        # Check if the piece belongs to the player whose turn it is
+        if piece != Piece.NONE and Piece.get_color(piece) == self.board.current_turn:
+            self.board.selected_piece = (index, piece)
+            self.selected_piece_image = self.canvas.create_image(event.x, event.y, image=self.piece_images[piece])
         else:
-            if self.board.selected_square == (rank, file):  # If the selected piece is clicked again, deselect it
-                self.board.deselect_piece()
-                self.canvas.delete(self.selected_piece_image)
-                self.selected_piece_image = None
-            else:
-                self.board.move_piece(index)
-                self.draw_board()
-                print(self.board.get_fen())
+            # If the piece does not belong to the current player, do not select it
+            self.board.selected_piece = None
+            self.selected_piece_image = None
+
 
     def on_piece_dragged(self, event):
-        if self.board.selected_piece is not None:
+        if self.selected_piece_image is not None:
             self.canvas.coords(self.selected_piece_image, event.x, event.y)
 
     def on_piece_dropped(self, event):
-        if self.board.selected_piece is not None:
+        if self.selected_piece_image is not None and self.board.selected_piece is not None:
             file = event.x // self.square_size
             rank = 7 - event.y // self.square_size
-            index = rank * 8 + file
-            piece_type = Piece.get_piece_type(self.board.selected_piece[1])
+            target_square_index = rank * 8 + file
+            selected_index, _ = self.board.selected_piece
             valid_moves = self.board.get_valid_moves(self.board.current_turn)
-            if index in valid_moves[piece_type]:
-                self.board.move_piece(index)
-                self.draw_board()
 
-                # error checking
-                print(self.board.get_fen())
-                print(self.board.get_valid_moves(self.board.current_turn))
+            # Check if the move is valid for the selected piece
+            if selected_index in valid_moves and target_square_index in [r * 8 + f for r, f in valid_moves[selected_index]]:
+                self.board.move_piece(target_square_index)
             else:
                 print("Invalid move. Please try again.")
-                self.draw_board()
+
+            self.canvas.delete(self.selected_piece_image)
+            self.selected_piece_image = None
+            self.board.selected_piece = None
+            self.draw_board()
+
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
 # test = "8/8/8/3p3p/8/8/8/B7"

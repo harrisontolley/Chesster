@@ -51,6 +51,8 @@ class Board:
         self.selected_square = None
         # Switch the turn
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+        print(self)
+
 
     def get_fen(self):
         fen = ""
@@ -72,13 +74,14 @@ class Board:
                 fen += "/"
         return fen
     
-    def get_valid_moves(self, colour_to_move):
-        moves = []
+    def get_valid_moves(self, color_to_move):
+        moves = {}
         for rank in range(8):
             for file in range(8):
-                piece = self.Square[rank * 8 + file]
-                if Piece.get_color(piece) == colour_to_move:
-                    moves += self.get_piece_moves(piece, rank, file)
+                index = rank * 8 + file
+                piece = self.Square[index]
+                if Piece.get_color(piece) == color_to_move:
+                    moves[index] = self.get_piece_moves(piece, rank, file)
         return moves
 
     def get_piece_moves(self, piece, rank, file):
