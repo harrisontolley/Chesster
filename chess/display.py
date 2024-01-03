@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Canvas, PhotoImage
 from pieces import Piece, convert_piece_to_string
-from board import load_position_from_fen
+from board import Board
 import os
 from PIL import Image, ImageTk
 
@@ -103,13 +103,19 @@ class ChessGUI:
             rank = 7 - event.y // self.square_size
             target_square_index = rank * 8 + file
             selected_index, _ = self.board.selected_piece
-            valid_moves = self.board.get_valid_moves(self.board.current_turn)
+            
+            
+            
+            # valid_moves = self.board.get_valid_moves(self.board.current_turn)
 
             # Check if the move is valid for the selected piece
-            if selected_index in valid_moves and target_square_index in [r * 8 + f for r, f in valid_moves[selected_index]]:
-                self.board.move_piece(target_square_index)
-            else:
-                print("Invalid move. Please try again.")
+            # if selected_index in valid_moves and target_square_index in [r * 8 + f for r, f in valid_moves[selected_index]]:
+            self.board.move_piece(target_square_index)
+            self.board.get_valid_moves(self.board.current_turn)
+            # else:
+            #     print("Invalid move. Please try again.")
+
+
 
             self.canvas.delete(self.selected_piece_image)
             self.selected_piece_image = None
@@ -119,7 +125,7 @@ class ChessGUI:
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p3p/8/8/8/B7"
-loaded_board = load_position_from_fen(starting_position)
+loaded_board = Board.load_position_from_fen(starting_position)
 
 root = tk.Tk()
 root.title("Chess GUI")
