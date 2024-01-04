@@ -267,61 +267,7 @@ class Board:
                     if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
                         moves.append((rank + i, file + j))
         return moves
-    
-    # def is_in_check(self, color):
-    #     # Find the king's position
-    #     king_position = None
-    #     for i, piece in enumerate(self.Square):
-    #         if Piece.get_piece_type(piece) == Piece.KING and Piece.get_color(piece) == color:
-    #             king_position = (7 - i // 8, i % 8)
-    #             break
 
-    #     # Check for threats to the king
-    #     opponent_color = Piece.BLACK if color == Piece.WHITE else Piece.BLACK
-    #     for i, piece in enumerate(self.Square):
-    #         if Piece.get_color(piece) == opponent_color:
-    #             moves = self.get_piece_moves(piece, 7 - i // 8, i % 8)
-    #             if king_position in [(move[0], move[1]) for move in moves]:
-    #                 return True
-    #     return False
-    
-    # def is_in_checkmate(self, color):
-    #     if not self.is_in_check(color):
-    #         return False
-    #     for rank in range(8):
-    #         for file in range(8):
-    #             piece = self.Square[rank * 8 + file]
-    #             if Piece.get_color(piece) != color:
-    #                 continue
-    #             moves = self.get_piece_moves(piece, rank, file)
-    #             for move in moves:
-    #                 board_copy = Board()
-    #                 board_copy.Square = self.Square.copy()
-    #                 board_copy.move_piece(move[0] * 8 + move[1])
-    #                 if not board_copy.is_in_check(color):
-    #                     return False
-    #     return True
-    
-    # def is_in_stalemate(self, color):
-    #     if self.is_in_check(color):
-    #         return False
-    #     for rank in range(8):
-    #         for file in range(8):
-    #             piece = self.Square[rank * 8 + file]
-    #             if Piece.get_color(piece) != color:
-    #                 continue
-    #             moves = self.get_piece_moves(piece, rank, file)
-    #             for move in moves:
-    #                 board_copy = Board()
-    #                 board_copy.Square = self.Square.copy()
-    #                 board_copy.move_piece(move[0] * 8 + move[1])
-    #                 if not board_copy.is_in_check(color):
-    #                     return False
-    #     return True
-    
-    # def is_draw(self):
-    #     return self.is_in_stalemate(Piece.WHITE) or self.is_in_stalemate(Piece.BLACK) or self.is_in_checkmate(Piece.WHITE) or self.is_in_checkmate(Piece.BLACK)
-    
     def clear_en_passant_square(self):
         self.en_passant_square = '-'
     
@@ -350,7 +296,7 @@ class Board:
         fen += " " + active_color
         return fen
     
-    def load_position_from_fen(fen):
+    def load_position_from_fen(fen: str):
         board = Board()
         parts = fen.split()
         piece_placement = parts[0]
@@ -359,7 +305,6 @@ class Board:
         en_passant_square = parts[3]
         halfmove_clock = parts[4]
         fullmove_number = parts[5]
-
 
         rank, file = 7, 0  # Start from the top-left corner of the board
         for char in piece_placement:
