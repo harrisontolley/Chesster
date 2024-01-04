@@ -165,7 +165,7 @@ class Board:
             for j in range(-2, 3):
                 if abs(i) + abs(j) == 3:
                     if rank + i in range(8) and file + j in range(8):
-                        if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) != color:
+                        if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
                             moves.append((rank + i, file + j))
         return moves
     
@@ -176,7 +176,7 @@ class Board:
             if rank + i in range(8) and file + i in range(8):
                 if self.Square[(rank + i) * 8 + file + i] == Piece.NONE:
                     moves.append((rank + i, file + i))
-                elif Piece.get_color(self.Square[(rank + i) * 8 + file + i]) != color:
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file + i]) == color:
                     moves.append((rank + i, file + i))
                     break
                 else:
@@ -185,7 +185,7 @@ class Board:
             if rank - i in range(8) and file + i in range(8):
                 if self.Square[(rank - i) * 8 + file + i] == Piece.NONE:
                     moves.append((rank - i, file + i))
-                elif Piece.get_color(self.Square[(rank - i) * 8 + file + i]) != color:
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file + i]) == color:
                     moves.append((rank - i, file + i))
                     break
                 else:
@@ -194,7 +194,7 @@ class Board:
             if rank + i in range(8) and file - i in range(8):
                 if self.Square[(rank + i) * 8 + file - i] == Piece.NONE:
                     moves.append((rank + i, file - i))
-                elif Piece.get_color(self.Square[(rank + i) * 8 + file - i]) != color:
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file - i]) == color:
                     moves.append((rank + i, file - i))
                     break
                 else:
@@ -203,7 +203,7 @@ class Board:
             if rank - i in range(8) and file - i in range(8):
                 if self.Square[(rank - i) * 8 + file - i] == Piece.NONE:
                     moves.append((rank - i, file - i))
-                elif Piece.get_color(self.Square[(rank - i) * 8 + file - i]) != color:
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file - i]) == color:
                     moves.append((rank - i, file - i))
                     break
                 else:
@@ -213,11 +213,12 @@ class Board:
     def get_rook_moves(self, piece, rank, file):
         moves = []
         color = Piece.get_color(piece)
+
         for i in range(1, 8):
             if rank + i in range(8):
                 if self.Square[(rank + i) * 8 + file] == Piece.NONE:
                     moves.append((rank + i, file))
-                elif Piece.get_color(self.Square[(rank + i) * 8 + file]) != color:
+                elif Piece.get_color(self.Square[(rank + i) * 8 + file]) == color:
                     moves.append((rank + i, file))
                     break
                 else:
@@ -226,7 +227,7 @@ class Board:
             if rank - i in range(8):
                 if self.Square[(rank - i) * 8 + file] == Piece.NONE:
                     moves.append((rank - i, file))
-                elif Piece.get_color(self.Square[(rank - i) * 8 + file]) != color:
+                elif Piece.get_color(self.Square[(rank - i) * 8 + file]) == color:
                     moves.append((rank - i, file))
                     break
                 else:
@@ -235,7 +236,7 @@ class Board:
             if file + i in range(8):
                 if self.Square[rank * 8 + file + i] == Piece.NONE:
                     moves.append((rank, file + i))
-                elif Piece.get_color(self.Square[rank * 8 + file + i]) != color:
+                elif Piece.get_color(self.Square[rank * 8 + file + i]) == color:
                     moves.append((rank, file + i))
                     break
                 else:
@@ -244,7 +245,7 @@ class Board:
             if file - i in range(8):
                 if self.Square[rank * 8 + file - i] == Piece.NONE:
                     moves.append((rank, file - i))
-                elif Piece.get_color(self.Square[rank * 8 + file - i]) != color:
+                elif Piece.get_color(self.Square[rank * 8 + file - i]) == color:
                     moves.append((rank, file - i))
                     break
                 else:
@@ -263,7 +264,7 @@ class Board:
         for i in range(-1, 2):
             for j in range(-1, 2):
                 if rank + i in range(8) and file + j in range(8):
-                    if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) != color:
+                    if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
                         moves.append((rank + i, file + j))
         return moves
     

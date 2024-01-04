@@ -127,8 +127,6 @@ class ChessGUI:
             # else:
             #     print("Invalid move. Please try again.")
 
-
-
             self.canvas.delete(self.selected_piece_image)
             self.selected_piece_image = None
             self.board.selected_piece = None
