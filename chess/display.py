@@ -36,7 +36,6 @@ class ChessGUI:
                     self.piece_images[piece] = ImageTk.PhotoImage(
                         Image.open(image_path).resize((self.square_size, self.square_size)))
 
-
     def draw_board(self):
         for rank in range(8):
             for file in range(8):
@@ -44,13 +43,25 @@ class ChessGUI:
                 x1, y1 = x0 + self.square_size, y0 + self.square_size
                 color = "#b4afa5" if (rank + file) % 2 == 0 else "#a17b37"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
-                piece = self.board.Square[rank * 8 + file]
+
+                # Get the square label
+                square_index = self.board.convert_file_rank_to_index(file, rank)
+                square_label = self.board.index_to_square[square_index]
+
+                # Draw the square label
+                label_color = 'black'
+                # if (rank + file) % 2 == 0 else 'white'
+                self.canvas.create_text(x0 + 10, y1 - 10, text=square_label, fill=label_color)
+
+                # Draw the piece image
+                piece = self.board.Square[square_index]
                 if piece != Piece.NONE:
                     piece_type = Piece.get_piece_type(piece)
                     color = Piece.get_color(piece)
                     piece_key = Piece.create_piece(piece_type, color)
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
+
 
     # def on_square_clicked(self, event):
     #     file = event.x // self.square_size
@@ -91,6 +102,7 @@ class ChessGUI:
             # If the piece does not belong to the current player, do not select it
             self.board.selected_piece = None
             self.selected_piece_image = None
+        print(f"Clicked square: {index} {self.board.index_to_square[index]} {(file, rank)}")
 
 
     def on_piece_dragged(self, event):
