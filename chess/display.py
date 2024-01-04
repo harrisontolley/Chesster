@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Canvas, PhotoImage
+from tkinter import Canvas
 from pieces import Piece, convert_piece_to_string
 from board import Board
 import os
