@@ -53,39 +53,23 @@ class Board:
     def convert_file_rank_to_index(self, file, rank):        
         return (rank * 8) + file
 
-    def select_piece(self, index):
-        if self.Square[index] == Piece.NONE:  # If the square is empty, do nothing
-            return
-        # If it's not the turn of the piece's color, do nothing
-        if Piece.get_color(self.Square[index]) != self.current_turn:
-            return
-        self.selected_piece = (index, self.Square[index])
-        self.selected_square = (7 - index // 8, index % 8)  # Set selected_square here
-        self.original_square = self.selected_square  # Store the original square
+    def move_piece(self, piece, current_square, destination_square):
+        # Calculate the index for the current and destination squares
 
-    def deselect_piece(self):
-        self.selected_piece = None
-        self.selected_square = None
-        self.original_square = None  # Clear the original square
-        self.destination_square = None  # Clear the destination square
+        # print("--------------MOVE PIECE FUNCTION--------------")
+        # print("CURRENT SQUARE: ", current_square)
+        # print("SQUARE[CURRENT SQUARE]: ", convert_piece_to_string(self.Square[destination_square]))
+        # print("DESTINATIOON SQUARE: ", destination_square)
+        # print("SQUARE[DESTINATION SQUARE]: ", convert_piece_to_string(self.Square[destination_square]))
 
-    def move_piece(self, index):
-        # Calculate the rank and file of the destination square
-        file = index % 8
-        rank = 7 - index // 8
+        # Move the piece
+        self.Square[current_square] = Piece.NONE
 
-        # Move the piece to the new square
-        self.Square[self.selected_piece[0]] = Piece.NONE
-        self.Square[index] = self.selected_piece[1]
-        self.selected_piece = None
-        self.destination_square = (rank, file)  # Store the destination square
-        self.selected_square = None
+        self.Square[destination_square] = piece
+
         # Switch the turn
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
-        opponent_color = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
-        # if self.is_in_check(opponent_color):
-        #     print(f"Player with color {opponent_color} is in check.")
-        print(self)
+        # print(self)
 
     def get_pieces_for_color(self, color):
         '''Returns a list of pieces for a given color.'''
@@ -129,15 +113,16 @@ class Board:
         color = Piece.get_color(piece)
 
         # Direction pawns can move (1 for white, -1 for black)
-        direction = 1 if color == Piece.WHITE else -1
+        direction = -1 if color == Piece.WHITE else 1
 
         # Forward move
         if 0 <= rank + direction < 8:
+
             if self.Square[self.convert_file_rank_to_index(file, rank + direction)] == Piece.NONE:
                 moves.append((rank + direction, file))
 
                 # Double move from starting position
-                starting_rank = 1 if color == Piece.WHITE else 6
+                starting_rank = 1 if color == Piece.BLACK else 6
                 if rank == starting_rank and self.Square[self.convert_file_rank_to_index(file, rank + 2 * direction)] == Piece.NONE:
                     moves.append((rank + 2 * direction, file))
 
@@ -146,7 +131,7 @@ class Board:
             capture_file = file + offset
             if 0 <= capture_file < 8 and 0 <= rank + direction < 8:
                 capture_index = self.convert_file_rank_to_index(capture_file, rank + direction)
-                if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) != color:
+                if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) == color:
                     moves.append((rank + direction, capture_file))
 
         # En passant
