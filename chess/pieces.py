@@ -56,5 +56,5 @@ piece_translation = {
     Piece.BISHOP: 'b',
     Piece.ROOK: 'r',
     Piece.QUEEN: 'q',
-    Piece.NONE: '.',
+    Piece.NONE: '-',
 }
