@@ -46,7 +46,7 @@ class ChessGUI:
 
                 # Get the square label
                 square_index = self.board.convert_file_rank_to_index(file, rank)
-                square_label = self.board.index_to_square[square_index]
+                square_label = Board.index_to_square(square_index)
 
                 # Draw the square label
                 label_color = 'black'
@@ -97,6 +97,9 @@ class ChessGUI:
             destination_rank = 7 - event.y // self.square_size
             destination_square = self.board.convert_file_rank_to_index(destination_file, destination_rank)
 
+            # print(self.board.get_piece_moves(piece, current_rank, current_file))
+
+            # if self.board.is_move_legal(piece, current_square, destination_square):
             self.board.move_piece(piece, current_square, destination_square)
 
             # Redraw the board and reset the selected piece
