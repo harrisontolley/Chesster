@@ -1,3 +1,6 @@
+"""display.py:
+File containing the ChessGUI class, which is used to display and manage the chess board state.
+"""
 import tkinter as tk
 from tkinter import Canvas
 from pieces import Piece, convert_piece_to_string
