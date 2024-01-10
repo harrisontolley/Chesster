@@ -55,10 +55,8 @@ class Board:
             # Switch the turn
             self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
-    def is_move_legal(self, piece, current_square, destination_square):
-        moves = self.get_piece_moves(piece, current_square // 8, current_square % 8)
-        print(self.get_valid_moves(self.current_turn))
-
+    def is_move_legal(self, move: Move):
+        # handles checking whether the move results in a check or illegal
         return True
 
     def get_pieces_for_color(self, color):
@@ -68,21 +66,6 @@ class Board:
             if Piece.get_color(piece) == color:
                 pieces.append((i, piece))
         return pieces
-
-    def get_valid_moves(self, color_to_move):
-        # Want to get all valid moves for a color to move
-        moves = []
-        # print("----------------------get_valid_moves() called--------------------")
-
-        for piece in self.get_pieces_for_color(color_to_move):
-
-            rank, file = 7 - piece[0] // 8, piece[0] % 8
-
-            moves = self.get_piece_moves(piece[1], rank, file)
-            moves_squares = [self.index_to_square(self.convert_file_rank_to_index(move[1], move[0])) for move in moves]
-            # print(f"Moves for {convert_piece_to_string(piece[1])} at {self.index_to_square[self.convert_file_rank_to_index(file, rank)]} {(file, rank)}: {moves_squares}")
-    
-        # print(moves)
 
     def get_piece_moves(self, piece, rank, file):
         piece_type = Piece.get_piece_type(piece)
