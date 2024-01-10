@@ -7,6 +7,7 @@ from pieces import Piece, convert_piece_to_string
 from board import Board
 import os
 from PIL import Image, ImageTk
+from move import Move
 
 class ChessGUI:
     def __init__(self, master, board):
@@ -89,27 +90,20 @@ class ChessGUI:
 
 
     def on_piece_dropped(self, event):
-        if self.selected_piece_image is not None and self.board.selected_piece is not None:
-            selected_index, piece = self.board.selected_piece
+            if self.selected_piece_image is not None and self.board.selected_piece is not None:
+                selected_index, piece = self.board.selected_piece
 
-            current_file = selected_index % 8
-            current_rank = selected_index // 8
-            current_square = self.board.convert_file_rank_to_index(current_file, current_rank)
+                current_square = (selected_index % 8, selected_index // 8)
+                destination_square = (event.x // self.square_size, 7 - event.y // self.square_size)
 
-            destination_file = event.x // self.square_size
-            destination_rank = 7 - event.y // self.square_size
-            destination_square = self.board.convert_file_rank_to_index(destination_file, destination_rank)
+                move = Move(piece, current_square, destination_square)
+                self.board.move_piece(move)
 
-            # print(self.board.get_piece_moves(piece, current_rank, current_file))
-
-            # if self.board.is_move_legal(piece, current_square, destination_square):
-            self.board.move_piece(piece, current_square, destination_square)
-
-            # Redraw the board and reset the selected piece
-            self.canvas.delete(self.selected_piece_image)
-            self.selected_piece_image = None
-            self.board.selected_piece = None
-            self.draw_board()
+                # Redraw the board and reset the selected piece
+                self.canvas.delete(self.selected_piece_image)
+                self.selected_piece_image = None
+                self.board.selected_piece = None
+                self.draw_board()
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p2pp/8/8/8/B7  w KQkq - 0 1"

@@ -2,6 +2,7 @@
 This module contains the Board class, which represents the chess board.
 """
 from pieces import Piece, convert_piece_to_string
+from move import Move
 
 class Board:
 
@@ -43,16 +44,16 @@ class Board:
     def convert_file_rank_to_index(self, file, rank):        
         return (rank * 8) + file
 
-    def move_piece(self, piece, current_square, destination_square):        
-        # Move the piece
-        self.Square[current_square] = Piece.NONE
+    def move_piece(self, move: Move):
+            # Move the piece
+            current_index = self.convert_file_rank_to_index(*move.current_square)
+            destination_index = self.convert_file_rank_to_index(*move.destination_square)
 
-        self.Square[destination_square] = piece
+            self.Square[current_index] = Piece.NONE
+            self.Square[destination_index] = move.piece
 
-        # print(self.get_valid_moves(self.current_turn))
-
-        # Switch the turn
-        self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+            # Switch the turn
+            self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
     def is_move_legal(self, piece, current_square, destination_square):
         moves = self.get_piece_moves(piece, current_square // 8, current_square % 8)
