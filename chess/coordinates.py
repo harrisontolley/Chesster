@@ -16,5 +16,5 @@ class Coordinates:
     def __repr__(self):
         return str(self)
 
-    def get_index(self):
+    def get_board_index(self):
         return self.rank * 8 + self.file
