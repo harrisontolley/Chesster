@@ -8,6 +8,7 @@ from board import Board
 import os
 from PIL import Image, ImageTk
 from move import Move
+from coordinates import Coordinates
 
 class ChessGUI:
     def __init__(self, master, board):
@@ -49,13 +50,12 @@ class ChessGUI:
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
                 # Get the square label
-                square_index = self.board.convert_file_rank_to_index(file, rank)
+                coordinates = Coordinates(file, rank)
+                square_index = coordinates.get_index()
                 square_label = Board.index_to_square(square_index)
 
                 # Draw the square label
-                label_color = 'black'
-                # if (rank + file) % 2 == 0 else 'white'
-                self.canvas.create_text(x0 + 10, y1 - 10, text=square_label, fill=label_color)
+                self.canvas.create_text(x0 + 10, y1 - 10, text=square_label, fill='black')
 
                 # Draw the piece image
                 piece = self.board.Square[square_index]
@@ -93,8 +93,8 @@ class ChessGUI:
             if self.selected_piece_image is not None and self.board.selected_piece is not None:
                 selected_index, piece = self.board.selected_piece
 
-                current_square = (selected_index % 8, selected_index // 8)
-                destination_square = (event.x // self.square_size, 7 - event.y // self.square_size)
+                current_square = Coordinates(selected_index % 8, selected_index // 8)
+                destination_square = Coordinates(event.x // self.square_size, 7 - event.y // self.square_size)
 
                 move = Move(piece, current_square, destination_square)
                 self.board.move_piece(move)

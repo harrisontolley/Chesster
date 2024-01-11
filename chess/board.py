@@ -3,15 +3,16 @@ This module contains the Board class, which represents the chess board.
 """
 from pieces import Piece, convert_piece_to_string
 from move import Move
+from coordinates import Coordinates
 
 class Board:
 
     def __init__(self):
         self.current_turn = Piece.WHITE
-        self.selected_piece = None
-        self.selected_square = None
-        self.original_square = None
-        self.destination_square = None
+        # self.selected_piece = None
+        # self.selected_square = None
+        # self.original_square = None
+        # self.destination_square = None
 
         self.en_passant_square = '-'
         self.halfmove_clock = 0
@@ -41,13 +42,13 @@ class Board:
             board_str += "\n"
         return board_str
     
-    def convert_file_rank_to_index(self, file, rank):        
-        return (rank * 8) + file
+    # def convert_file_rank_to_index(self, file, rank):        
+    #     return (rank * 8) + file
 
     def move_piece(self, move: Move):
             # Move the piece
-            current_index = self.convert_file_rank_to_index(*move.current_square)
-            destination_index = self.convert_file_rank_to_index(*move.destination_square)
+            current_index = move.get_current_square().get_index()
+            destination_index = move.get_destination_square().get_index()
 
             self.Square[current_index] = Piece.NONE
             self.Square[destination_index] = move.piece
