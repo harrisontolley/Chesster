@@ -18,3 +18,9 @@ class Coordinates:
 
     def get_board_index(self):
         return self.rank * 8 + self.file
+    
+    def get_file(self):
+        return self.file
+    
+    def get_rank(self):
+        return self.rank
