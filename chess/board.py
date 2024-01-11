@@ -9,11 +9,6 @@ class Board:
 
     def __init__(self):
         self.current_turn = Piece.WHITE
-        # self.selected_piece = None
-        # self.selected_square = None
-        # self.original_square = None
-        # self.destination_square = None
-
         self.en_passant_square = '-'
         self.halfmove_clock = 0
         self.fullmove_number = 1
@@ -41,17 +36,14 @@ class Board:
                 board_str += convert_piece_to_string(piece)
             board_str += "\n"
         return board_str
-    
-    # def convert_file_rank_to_index(self, file, rank):        
-    #     return (rank * 8) + file
 
     def move_piece(self, move: Move):
             # Move the piece
-            current_index = move.get_current_square().get_index()
-            destination_index = move.get_destination_square().get_index()
+            current_index = move.get_current_square().get_board_index()
+            destination_index = move.get_destination_square().get_board_index()
 
             self.Square[current_index] = Piece.NONE
-            self.Square[destination_index] = move.piece
+            self.Square[destination_index] = move.get_piece()
 
             # Switch the turn
             self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
@@ -59,14 +51,10 @@ class Board:
     def is_move_legal(self, move: Move):
         # handles checking whether the move results in a check or illegal
         return True
+    
+    
 
-    def get_pieces_for_color(self, color):
-        '''Returns a list of pieces for a given color.'''
-        pieces = []
-        for i, piece in enumerate(self.Square):
-            if Piece.get_color(piece) == color:
-                pieces.append((i, piece))
-        return pieces
+
 
     def get_piece_moves(self, piece, rank, file):
         piece_type = Piece.get_piece_type(piece)
@@ -285,3 +273,11 @@ class Board:
 
         board.current_turn = Piece.WHITE if active_color == 'w' else Piece.BLACK
         return board
+
+    def get_pieces_for_color(self, color):
+        '''Returns a list of pieces for a given color.'''
+        pieces = []
+        for i, piece in enumerate(self.Square):
+            if Piece.get_color(piece) == color:
+                pieces.append((i, piece))
+        return pieces
