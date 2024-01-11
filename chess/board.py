@@ -39,21 +39,30 @@ class Board:
 
     def move_piece(self, move: Move):
             # Move the piece
-            current_index = move.get_current_square().get_board_index()
-            destination_index = move.get_destination_square().get_board_index()
+            if self.move_is_legal(move):
+                current_index = move.get_current_square().get_board_index()
+                destination_index = move.get_destination_square().get_board_index()
 
-            self.Square[current_index] = Piece.NONE
-            self.Square[destination_index] = move.get_piece()
+                self.Square[current_index] = Piece.NONE
+                self.Square[destination_index] = move.get_piece()
 
-            # Switch the turn
-            self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
+                self.switch_turn()
 
-    def is_move_legal(self, move: Move):
+    def move_is_legal(self, move: Move):
         # handles checking whether the move results in a check or illegal
-        return True
-    
-    
 
+        return True
+
+    def get_all_moves_for_color(self, color):
+        moves = []
+        for i, piece in enumerate(self.Square):
+            if Piece.get_color(piece) == color:
+                rank, file = i // 8, i % 8
+                moves += self.get_piece_moves(piece, rank, file)
+        return moves
+    
+    def switch_turn(self):
+        self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
 
     def get_piece_moves(self, piece, rank, file):
@@ -117,7 +126,8 @@ class Board:
                         if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
                             moves.append((rank + i, file + j))
         return moves
-    
+
+
     def get_bishop_moves(self, piece, rank, file):
         moves = []
         color = Piece.get_color(piece)
@@ -158,7 +168,8 @@ class Board:
                 else:
                     break
         return moves
-    
+
+
     def get_rook_moves(self, piece, rank, file):
         moves = []
         color = Piece.get_color(piece)
@@ -200,7 +211,8 @@ class Board:
                 else:
                     break
         return moves
-    
+
+
     def get_queen_moves(self, piece, rank, file):
         moves = []
         moves += self.get_bishop_moves(piece, rank, file)
@@ -216,6 +228,7 @@ class Board:
                     if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
                         moves.append((rank + i, file + j))
         return moves
+
 
     def clear_en_passant_square(self):
         self.en_passant_square = '-'
@@ -244,7 +257,8 @@ class Board:
         active_color = 'w' if self.current_turn == Piece.WHITE else 'b'
         fen += " " + active_color
         return fen
-    
+
+
     def load_position_from_fen(fen: str):
         board = Board()
         parts = fen.split()
@@ -273,11 +287,3 @@ class Board:
 
         board.current_turn = Piece.WHITE if active_color == 'w' else Piece.BLACK
         return board
-
-    def get_pieces_for_color(self, color):
-        '''Returns a list of pieces for a given color.'''
-        pieces = []
-        for i, piece in enumerate(self.Square):
-            if Piece.get_color(piece) == color:
-                pieces.append((i, piece))
-        return pieces
