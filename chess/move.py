@@ -18,3 +18,15 @@ class Move:
     
     def get_destination_square(self):
         return self.destination_square
+
+    def get_piece(self):
+        return self.piece
+    
+    def get_piece_type(self):
+        return Piece.get_piece_type(self.piece)
+    
+    def get_piece_color(self):
+        return Piece.get_color(self.piece)
+    
+    def __eq__(self, other) -> bool:
+        return self.piece == other.piece and self.current_square == other.current_square and self.destination_square == other.destination_square
