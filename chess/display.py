@@ -51,7 +51,7 @@ class ChessGUI:
 
                 # Get the square label
                 coordinates = Coordinates(file, rank)
-                square_index = coordinates.get_index()
+                square_index = coordinates.get_board_index()
                 square_label = Board.index_to_square(square_index)
 
                 # Draw the square label
