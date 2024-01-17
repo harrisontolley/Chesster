@@ -17,7 +17,7 @@ class Board:
         self.Square = [0] * 64
     
     @staticmethod
-    def square_to_index(square):
+    def square_to_index(square: str):
         file = ord(square[0]) - ord('a')
         rank = int(square[1]) - 1
         return rank * 8 + file
@@ -27,6 +27,12 @@ class Board:
         file = chr((index % 8) + ord('a'))
         rank = index // 8 + 1
         return f"{file}{rank}"
+    
+    @staticmethod
+    def index_to_coordinates(index: int) -> Coordinates:
+        file = chr((index % 8) + ord('a'))
+        rank = index // 8 + 1
+        return Coordinates(file, rank)
 
     def __str__(self):
         board_str = ""
@@ -48,40 +54,59 @@ class Board:
 
                 self.switch_turn()
 
-    def move_is_legal(self, move: Move):
-        # handles checking whether the move results in a check or illegal
-
+    def move_is_legal(self, move: Move) -> bool:
         return True
 
-    def get_all_moves_for_color(self, color):
+        # handles checking whether the move results in a check or illegal
+        # piece = move.get_piece()
+        # piece_type = Piece.get_piece_type(piece)
+        # current_square = move.get_current_square()
+
+        # possible_squares = self.get_squares_piece_can_move_to(piece, current_square)
+
+        # if move.get_destination_square() not in possible_squares:
+        #     return False
+
+        # are we in check?
+        # Yes:
+            # does destination square block check
+        # No:
+
+
+        # does move put us in check
+
+
+        # check if move results in check
+
+
+        # is move in squares of possible moves
+    
+    def get_squares_piece_can_move_to(self, piece, current_coords: Coordinates) -> list[Coordinates]:
         moves = []
-        for i, piece in enumerate(self.Square):
-            if Piece.get_color(piece) == color:
-                rank, file = i // 8, i % 8
-                moves += self.get_piece_moves(piece, rank, file)
-        return moves
+    
+
     
     def switch_turn(self):
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
 
-    def get_piece_moves(self, piece, rank, file):
+    def get_piece_moves(self, piece, current_coords: Coordinates) -> list[Coordinates]:
         piece_type = Piece.get_piece_type(piece)
         if piece_type == Piece.PAWN:
-            return self.get_pawn_moves(piece, rank, file)
+            return self.get_pawn_moves(piece, current_coords)
         elif piece_type == Piece.KNIGHT:
-            return self.get_knight_moves(piece, rank, file)
+            return self.get_knight_moves(piece, current_coords)
         elif piece_type == Piece.BISHOP:
-            return self.get_bishop_moves(piece, rank, file)
+            return self.get_bishop_moves(piece, current_coords)
         elif piece_type == Piece.ROOK:
-            return self.get_rook_moves(piece, rank, file)
+            return self.get_rook_moves(piece, current_coords)
         elif piece_type == Piece.QUEEN:
-            return self.get_queen_moves(piece, rank, file)
+            return self.get_queen_moves(piece, current_coords)
         elif piece_type == Piece.KING:
-            return self.get_king_moves(piece, rank, file)
+            return self.get_king_moves(piece, current_coords)
         return []
     
-    def get_pawn_moves(self, piece, rank, file):
+    def get_pawn_moves(self, piece, current_coords: Coordinates) -> list[Coordinates]:
         moves = []
         color = Piece.get_color(piece)
 
@@ -89,29 +114,59 @@ class Board:
         direction = -1 if color == Piece.WHITE else 1
 
         # Forward move
-        if 0 <= rank + direction < 8:
+        pushed_coords = Coordinates(current_coords.get_file(), current_coords.get_rank() + direction)
+        if 0 <= pushed_coords.get_rank() < 8:
 
-            if self.Square[self.convert_file_rank_to_index(file, rank + direction)] == Piece.NONE:
-                moves.append((rank + direction, file))
+            if self.Square[pushed_coords.get_board_index()] == Piece.NONE:
+                moves.append(Move(piece, current_coords, pushed_coords))
 
                 # Double move from starting position
                 starting_rank = 1 if color == Piece.BLACK else 6
-                if rank == starting_rank and self.Square[self.convert_file_rank_to_index(file, rank + 2 * direction)] == Piece.NONE:
-                    moves.append((rank + 2 * direction, file))
+                # ! really this should be 1 if color == white, else black
+                # ! think need to reformat the way piecees are placed.
+
+                if current_coords.get_rank() == starting_rank:
+
+                    double_pushed_coords = Coordinates(current_coords.get_file(), current_coords.get_rank() + 2 * direction)
+
+                    if self.Square[double_pushed_coords.get_board_index()] == Piece.NONE:
+                        moves.append(double_pushed_coords)
 
         # Captures
         for offset in [-1, 1]:
-            capture_file = file + offset
-            if 0 <= capture_file < 8 and 0 <= rank + direction < 8:
-                capture_index = self.convert_file_rank_to_index(capture_file, rank + direction)
+            capture_coords = Coordinates(current_coords.get_file() + offset, current_coords.get_rank() + direction)
+            
+
+            capture_file = capture_coords.get_file() + offset
+            capture_rank = capture_coords.get_rank() + direction
+            if 0 <= capture_file < 8 and 0 <= capture_rank < 8:
+                capture_index = capture_coords.get_board_index()
+
+
                 if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) == color:
-                    moves.append((rank + direction, capture_file))
+                    taken_piece_coords = Coordinates(capture_file, capture_rank)
+                    moves.append(taken_piece_coords)
+
 
         # En passant
         if self.en_passant_square != '-':
-            en_passant_rank, en_passant_file = 7 - self.square_to_index(self.en_passant_square) // 8, self.square_to_index(self.en_passant_square) % 8
-            if rank == en_passant_rank and abs(file - en_passant_file) == 1:
-                moves.append((en_passant_rank + direction, en_passant_file))
+
+            en_passant_index = self.square_to_index(self.get_en_passant_tile())
+
+            en_passant_coordinates = self.index_to_coordinates(en_passant_index)
+
+            for offset in [-1, 1]:
+                taking_coordinates = Coordinates(current_coords.get_file() + offset, current_coords.get_rank() + direction) # doesn't need bounds checking as irrelevant here
+                if taking_coordinates == en_passant_coordinates:
+                    moves.append(en_passant_coordinates)
+                    break
+
+            # en_passant_rank, en_passant_file = 7 - self.square_to_index(self.en_passant_square) // 8, self.square_to_index(self.en_passant_square) % 8
+
+            # if rank == en_passant_rank and abs(file - en_passant_file) == 1:
+            #     moves.append((en_passant_rank + direction, en_passant_file))
+
+
 
         return moves
 
@@ -287,3 +342,6 @@ class Board:
 
         board.current_turn = Piece.WHITE if active_color == 'w' else Piece.BLACK
         return board
+
+    def get_en_passant_tile(self) -> str:
+        return self.en_passant_square
