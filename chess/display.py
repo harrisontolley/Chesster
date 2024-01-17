@@ -97,13 +97,20 @@ class ChessGUI:
                 destination_square = Coordinates(event.x // self.square_size, 7 - event.y // self.square_size)
 
                 move = Move(piece, current_square, destination_square)
-                self.board.move_piece(move)
+                
+                # if move legal
+                    # complete move
+
+                self.get_board().move_piece(move)
 
                 # Redraw the board and reset the selected piece
                 self.canvas.delete(self.selected_piece_image)
                 self.selected_piece_image = None
                 self.board.selected_piece = None
                 self.draw_board()
+
+    def get_board(self) -> Board:
+        return self.board
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p2pp/8/8/8/B7  w KQkq - 0 1"
