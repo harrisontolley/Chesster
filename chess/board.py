@@ -46,8 +46,8 @@ class Board:
 
     def move_piece(self, move: Move):
             # Move the piece
-            current_index = move.get_current_square().get_board_index()
-            destination_index = move.get_destination_square().get_board_index()
+            current_index = move.get_current_coordinates().get_board_index()
+            destination_index = move.get_destination_coordinates().get_board_index()
 
             self.Square[current_index] = Piece.NONE
             self.Square[destination_index] = move.get_piece()
@@ -81,8 +81,9 @@ class Board:
             piece = piece_idx[0]
             idx = piece_idx[1]
 
-            current_coords = Coordinates().coordinates_from_idx(idx)
-
+            current_coords = Coordinates(idx % 8, idx // 8)
+            # current_coords = Coordinates().coordinates_from_idx(idx)
+            
             piece_moves = self.get_piece_moves(piece, current_coords)
 
             moves += piece_moves
@@ -115,7 +116,7 @@ class Board:
         color = Piece.get_color(piece)
 
         # Direction pawns can move (1 for white, -1 for black)
-        direction = -1 if color == Piece.WHITE else 1
+        direction = -1 if color == Piece.BLACK else 1
 
         # Forward move
         pushed_coords = Coordinates(current_coords.get_file(), current_coords.get_rank() + direction)
@@ -125,9 +126,7 @@ class Board:
                 moves.append(Move(piece, current_coords, pushed_coords))
 
                 # Double move from starting position
-                starting_rank = 1 if color == Piece.BLACK else 6
-                # ! really this should be 1 if color == white, else black
-                # ! think need to reformat the way piecees are placed.
+                starting_rank = 1 if color == Piece.WHITE else 6
 
                 if current_coords.get_rank() == starting_rank:
 
@@ -147,7 +146,7 @@ class Board:
                 capture_index = capture_coords.get_board_index()
 
 
-                if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) == color:
+                if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) != color:
                     taken_piece_coords = Coordinates(capture_file, capture_rank)
                     moves.append(Move(piece, current_coords, taken_piece_coords))
 
@@ -187,7 +186,7 @@ class Board:
 
                         destination_coords = Coordinates(current_file + x_offset, current_rank + y_offset)
 
-                        if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                        if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                             moves.append(Move(piece, current_coords, destination_coords))
 
         return moves
@@ -206,18 +205,18 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
         for SE_offset in range(1, 8):
             if current_rank - SE_offset in range(8) and current_file + SE_offset in range(8):
-                destination_coords = Coordinates(current_file + SE_offset, current_rank + SE_offset)
+                destination_coords = Coordinates(current_file + SE_offset, current_rank - SE_offset)
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -228,18 +227,18 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
         for SW_offset in range(1, 8):
             if current_rank - SW_offset in range(8) and current_file - SW_offset in range(8):
-                destination_coords = Coordinates(current_file + SW_offset, current_rank + SW_offset)
+                destination_coords = Coordinates(current_file - SW_offset, current_rank - SW_offset)
                 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -260,7 +259,7 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -271,7 +270,7 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -282,7 +281,7 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -293,7 +292,7 @@ class Board:
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
-                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                     moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
@@ -317,9 +316,9 @@ class Board:
         for x_offset in range(-1, 2):
             for y_offset in range(-1, 2):
                 if current_rank + y_offset in range(8) and current_file + x_offset in range(8):
-                    destination_coords = Coordinates(current_rank + y_offset, current_file + x_offset)
+                    destination_coords = Coordinates(current_file + x_offset, current_rank + y_offset)
 
-                    if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                    if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                         moves.append(Move(piece, current_coords, destination_coords))
         return moves
 
