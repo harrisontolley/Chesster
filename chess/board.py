@@ -138,18 +138,16 @@ class Board:
         # Captures
         for offset in [-1, 1]:
             capture_coords = Coordinates(current_coords.get_file() + offset, current_coords.get_rank() + direction)
-            
 
-            capture_file = capture_coords.get_file() + offset
-            capture_rank = capture_coords.get_rank() + direction
+            capture_file = capture_coords.get_file()
+            capture_rank = capture_coords.get_rank()
+
             if 0 <= capture_file < 8 and 0 <= capture_rank < 8:
                 capture_index = capture_coords.get_board_index()
-
 
                 if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) != color:
                     taken_piece_coords = Coordinates(capture_file, capture_rank)
                     moves.append(Move(piece, current_coords, taken_piece_coords))
-
 
         # En passant
         if self.en_passant_square != '-':
@@ -223,7 +221,7 @@ class Board:
                     break
         for NW_offset in range(1, 8):
             if current_rank + NW_offset in range(8) and current_file - NW_offset in range(8):
-                destination_coords = Coordinates(current_file + NW_offset, current_rank + NW_offset)
+                destination_coords = Coordinates(current_file - NW_offset, current_rank + NW_offset)
 
                 if self.Square[destination_coords.get_board_index()] == Piece.NONE:
                     moves.append(Move(piece, current_coords, destination_coords))
