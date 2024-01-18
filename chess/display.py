@@ -100,6 +100,8 @@ class ChessGUI:
                     # complete move
                 self.get_board().move_piece(move)
 
+                for move in self.get_board().get_all_possible_moves(self.get_board().get_current_turn()):
+                    print(str(move))
                 # Redraw the board and reset the selected piece
                 self.canvas.delete(self.selected_piece_image)
                 self.selected_piece_image = None
