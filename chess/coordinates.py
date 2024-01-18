@@ -7,7 +7,7 @@ class Coordinates:
         self.rank = rank
 
     def __str__(self):
-        return f"({self.rank}, {self.file})"
+        return f"({self.file}, {self.rank})"
 
     def __eq__(self, other):
         return self.rank == other.rank and self.file == other.file
