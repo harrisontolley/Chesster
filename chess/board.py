@@ -110,7 +110,7 @@ class Board:
             return self.get_king_moves(piece, current_coords)
         return []
     
-    def get_pawn_moves(self, piece, current_coords: Coordinates) -> list[Coordinates]:
+    def get_pawn_moves(self, piece, current_coords: Coordinates) -> list[Move]:
         moves = []
         color = Piece.get_color(piece)
 
@@ -170,20 +170,26 @@ class Board:
             # if rank == en_passant_rank and abs(file - en_passant_file) == 1:
             #     moves.append((en_passant_rank + direction, en_passant_file))
 
-
-
         return moves
 
 
-    def get_knight_moves(self, piece, rank, file):
+    def get_knight_moves(self, piece, current_coords: Coordinates) -> list[Move]:
         moves = []
         color = Piece.get_color(piece)
-        for i in range(-2, 3):
-            for j in range(-2, 3):
-                if abs(i) + abs(j) == 3:
-                    if rank + i in range(8) and file + j in range(8):
-                        if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
-                            moves.append((rank + i, file + j))
+        
+        current_rank = current_coords.get_rank()
+        current_file = current_coords.get_file()
+        
+        for y_offset in range(-2, 3):
+            for x_offset in range(-2, 3):
+                if abs(x_offset) + abs(y_offset) == 3:
+                    if current_rank + y_offset in range(8) and current_file + x_offset in range(8):
+
+                        destination_coords = Coordinates(current_file + x_offset, current_rank + y_offset)
+
+                        if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                            moves.append(Move(piece, current_coords, destination_coords))
+
         return moves
 
 
