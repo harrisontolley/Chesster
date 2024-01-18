@@ -23,7 +23,6 @@ class ChessGUI:
         self.selected_piece_image = None
         self.load_piece_images()
         self.draw_board()
-        # self.canvas.bind("<Button-1>", self.on_square_clicked)
         self.canvas.bind("<Button-1>", self.on_piece_clicked)
         self.canvas.bind("<B1-Motion>", self.on_piece_dragged)
         self.canvas.bind("<ButtonRelease-1>", self.on_piece_dropped)
@@ -81,7 +80,7 @@ class ChessGUI:
             # If the piece does not belong to the current player, do not select it
             self.selected_piece_image = None
             return
-        # print(f"Clicked square: {index} {self.board.index_to_square[index]} {(file, rank)}")
+        # print(f"Clicked square: {index} {(file, rank)}") # {self.get_board().index_to_square[index]} 
 
 
     def on_piece_dragged(self, event):
@@ -97,10 +96,8 @@ class ChessGUI:
                 destination_square = Coordinates(event.x // self.square_size, 7 - event.y // self.square_size)
 
                 move = Move(piece, current_square, destination_square)
-                
                 # if move legal
                     # complete move
-
                 self.get_board().move_piece(move)
 
                 # Redraw the board and reset the selected piece
