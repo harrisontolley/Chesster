@@ -301,20 +301,26 @@ class Board:
         return moves
 
 
-    def get_queen_moves(self, piece, rank, file):
+    def get_queen_moves(self, piece, current_coords: Coordinates) -> list[Move]:
         moves = []
-        moves += self.get_bishop_moves(piece, rank, file)
-        moves += self.get_rook_moves(piece, rank, file)
+        moves += self.get_bishop_moves(piece, current_coords)
+        moves += self.get_rook_moves(piece, current_coords)
         return moves
     
-    def get_king_moves(self, piece, rank, file):
+    def get_king_moves(self, piece, current_coords: Coordinates):
         moves = []
         color = Piece.get_color(piece)
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if rank + i in range(8) and file + j in range(8):
-                    if self.Square[(rank + i) * 8 + file + j] == Piece.NONE or Piece.get_color(self.Square[(rank + i) * 8 + file + j]) == color:
-                        moves.append((rank + i, file + j))
+
+        current_file = current_coords.get_file()
+        current_rank = current_coords.get_rank()
+
+        for x_offset in range(-1, 2):
+            for y_offset in range(-1, 2):
+                if current_rank + y_offset in range(8) and current_file + x_offset in range(8):
+                    destination_coords = Coordinates(current_rank + y_offset, current_file + x_offset)
+
+                    if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                        moves.append(Move(piece, current_coords, destination_coords))
         return moves
 
 
