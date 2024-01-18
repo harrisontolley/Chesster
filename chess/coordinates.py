@@ -1,7 +1,6 @@
 """square.py:
 This file contains the Square class, which is used to represent a square on the chess board.
 """
-
 class Coordinates:
     def __init__(self, file: int, rank: int):
         self.file = file
@@ -24,3 +23,9 @@ class Coordinates:
     
     def get_rank(self):
         return self.rank
+    
+    @staticmethod
+    def coordinates_from_idx(idx):
+        file = idx % 8
+        rank = idx // 8
+        return Coordinates(file, rank)
