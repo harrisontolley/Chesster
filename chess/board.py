@@ -30,7 +30,8 @@ class Board:
     
     @staticmethod
     def index_to_coordinates(index: int) -> Coordinates:
-        file = chr((index % 8) + ord('a'))
+        # ! WRONG DO NOT USE
+        file = index % 8
         rank = index // 8 + 1
         return Coordinates(file, rank)
 
@@ -45,52 +46,55 @@ class Board:
 
     def move_piece(self, move: Move):
             # Move the piece
-            if self.move_is_legal(move):
-                current_index = move.get_current_square().get_board_index()
-                destination_index = move.get_destination_square().get_board_index()
+            current_index = move.get_current_square().get_board_index()
+            destination_index = move.get_destination_square().get_board_index()
 
-                self.Square[current_index] = Piece.NONE
-                self.Square[destination_index] = move.get_piece()
+            self.Square[current_index] = Piece.NONE
+            self.Square[destination_index] = move.get_piece()
 
-                self.switch_turn()
+            self.switch_turn()
 
     def move_is_legal(self, move: Move) -> bool:
-        return True
+        # return True # ! DELETE WHEN IMPL.
 
-        # handles checking whether the move results in a check or illegal
-        # piece = move.get_piece()
-        # piece_type = Piece.get_piece_type(piece)
-        # current_square = move.get_current_square()
-
-        # possible_squares = self.get_squares_piece_can_move_to(piece, current_square)
-
-        # if move.get_destination_square() not in possible_squares:
-        #     return False
-
-        # are we in check?
-        # Yes:
-            # does destination square block check
-        # No:
+        all_possible_moves = self.get_all_possible_moves(self.get_current_turn())
+        if move in all_possible_moves:
+            return True
+        else:
+            return False
 
 
-        # does move put us in check
+    def get_all_pieces_of_color(self, color) -> [(Piece, int)]:
+        pieces = []
+        for idx, piece in enumerate(self.Square):
+            if piece != Piece.NONE and Piece.get_color(piece) == color:
+                pieces.append((piece, idx))
+
+        return pieces
 
 
-        # check if move results in check
-
-
-        # is move in squares of possible moves
-    
-    def get_squares_piece_can_move_to(self, piece, current_coords: Coordinates) -> list[Coordinates]:
+    def get_all_possible_moves(self, color):
         moves = []
-    
+        piece_idx_array = self.get_all_pieces_of_color(color)
 
-    
+        for piece_idx in piece_idx_array:
+            piece = piece_idx[0]
+            idx = piece_idx[1]
+
+            current_coords = Coordinates().coordinates_from_idx(idx)
+
+            piece_moves = self.get_piece_moves(piece, current_coords)
+
+            moves += piece_moves
+        
+        return moves
+
+
     def switch_turn(self):
         self.current_turn = Piece.BLACK if self.current_turn == Piece.WHITE else Piece.WHITE
 
 
-    def get_piece_moves(self, piece, current_coords: Coordinates) -> list[Coordinates]:
+    def get_piece_moves(self, piece, current_coords: Coordinates) -> list[Move]:
         piece_type = Piece.get_piece_type(piece)
         if piece_type == Piece.PAWN:
             return self.get_pawn_moves(piece, current_coords)
@@ -130,7 +134,7 @@ class Board:
                     double_pushed_coords = Coordinates(current_coords.get_file(), current_coords.get_rank() + 2 * direction)
 
                     if self.Square[double_pushed_coords.get_board_index()] == Piece.NONE:
-                        moves.append(double_pushed_coords)
+                        moves.append(Move(piece, current_coords, double_pushed_coords))
 
         # Captures
         for offset in [-1, 1]:
@@ -145,7 +149,7 @@ class Board:
 
                 if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) == color:
                     taken_piece_coords = Coordinates(capture_file, capture_rank)
-                    moves.append(taken_piece_coords)
+                    moves.append(Move(piece, current_coords, taken_piece_coords))
 
 
         # En passant
@@ -345,3 +349,6 @@ class Board:
 
     def get_en_passant_tile(self) -> str:
         return self.en_passant_square
+    
+    def get_current_turn(self) -> int:
+        return self.current_turn
