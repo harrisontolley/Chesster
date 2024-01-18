@@ -193,42 +193,54 @@ class Board:
         return moves
 
 
-    def get_bishop_moves(self, piece, rank, file):
+    def get_bishop_moves(self, piece, current_coords) -> list[Move]:
         moves = []
         color = Piece.get_color(piece)
-        for i in range(1, 8):
-            if rank + i in range(8) and file + i in range(8):
-                if self.Square[(rank + i) * 8 + file + i] == Piece.NONE:
-                    moves.append((rank + i, file + i))
-                elif Piece.get_color(self.Square[(rank + i) * 8 + file + i]) == color:
-                    moves.append((rank + i, file + i))
+        
+        current_file = current_coords.get_file()
+        current_rank = current_coords.get_rank()
+
+        for NE_offset in range(1, 8):
+            if current_rank + NE_offset in range(8) and current_file + NE_offset in range(8):
+                destination_coords = Coordinates(current_file + NE_offset, current_rank + NE_offset)
+
+                if self.Square[destination_coords.get_board_index()] == Piece.NONE:
+                    moves.append(Move(piece, current_coords, destination_coords))
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                    moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
-        for i in range(1, 8):
-            if rank - i in range(8) and file + i in range(8):
-                if self.Square[(rank - i) * 8 + file + i] == Piece.NONE:
-                    moves.append((rank - i, file + i))
-                elif Piece.get_color(self.Square[(rank - i) * 8 + file + i]) == color:
-                    moves.append((rank - i, file + i))
+        for SE_offset in range(1, 8):
+            if current_rank - SE_offset in range(8) and current_file + SE_offset in range(8):
+                destination_coords = Coordinates(current_file + SE_offset, current_rank + SE_offset)
+
+                if self.Square[destination_coords.get_board_index()] == Piece.NONE:
+                    moves.append(Move(piece, current_coords, destination_coords))
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                    moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
-        for i in range(1, 8):
-            if rank + i in range(8) and file - i in range(8):
-                if self.Square[(rank + i) * 8 + file - i] == Piece.NONE:
-                    moves.append((rank + i, file - i))
-                elif Piece.get_color(self.Square[(rank + i) * 8 + file - i]) == color:
-                    moves.append((rank + i, file - i))
+        for NW_offset in range(1, 8):
+            if current_rank + NW_offset in range(8) and current_file - NW_offset in range(8):
+                destination_coords = Coordinates(current_file + NW_offset, current_rank + NW_offset)
+
+                if self.Square[destination_coords.get_board_index()] == Piece.NONE:
+                    moves.append(Move(piece, current_coords, destination_coords))
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                    moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
-        for i in range(1, 8):
-            if rank - i in range(8) and file - i in range(8):
-                if self.Square[(rank - i) * 8 + file - i] == Piece.NONE:
-                    moves.append((rank - i, file - i))
-                elif Piece.get_color(self.Square[(rank - i) * 8 + file - i]) == color:
-                    moves.append((rank - i, file - i))
+        for SW_offset in range(1, 8):
+            if current_rank - SW_offset in range(8) and current_file - SW_offset in range(8):
+                destination_coords = Coordinates(current_file + SW_offset, current_rank + SW_offset)
+                
+                if self.Square[destination_coords.get_board_index()] == Piece.NONE:
+                    moves.append(Move(piece, current_coords, destination_coords))
+                elif Piece.get_color(self.Square[destination_coords.get_board_index()]) == color:
+                    moves.append(Move(piece, current_coords, destination_coords))
                     break
                 else:
                     break
