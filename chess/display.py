@@ -96,14 +96,21 @@ class ChessGUI:
                 destination_square = Coordinates(event.x // self.square_size, 7 - event.y // self.square_size)
 
                 move = Move(piece, current_square, destination_square)
-                # if move legal
-                    # complete move
-                self.get_board().move_piece(move)
+                
+                legal_moves = self.board.get_all_possible_moves(self.board.get_current_turn())
 
-                for move in self.get_board().get_all_possible_moves(self.get_board().get_current_turn()):
-                    print(str(move))
-                # Redraw the board and reset the selected piece
-                self.canvas.delete(self.selected_piece_image)
+
+                if move in legal_moves:
+                    self.get_board().move_piece(move)
+
+                    # Redraw the board and reset the selected piece
+                    self.canvas.delete(self.selected_piece_image)
+
+                    # self.selected_piece_image = None
+                    # self.board.selected_piece = None
+                    # self.draw_board()
+                else:
+                    self.canvas.coords(self.selected_piece_image, event.x, event.y)
                 self.selected_piece_image = None
                 self.board.selected_piece = None
                 self.draw_board()
