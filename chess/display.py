@@ -51,7 +51,7 @@ class ChessGUI:
                 # Get the square label
                 coordinates = Coordinates(file, rank)
                 square_index = coordinates.get_board_index()
-                square_label = Board.index_to_square(square_index)
+                square_label = Board.convert_index_to_tile(square_index)
 
                 # Draw the square label
                 self.canvas.create_text(x0 + 10, y1 - 10, text=square_label, fill='black')
@@ -65,6 +65,7 @@ class ChessGUI:
                     image = self.piece_images[piece_key]
                     self.canvas.create_image(x0 + self.square_size/2, y0 + self.square_size/2, image=image)
 
+        # print("EN PASSANT SQUARE", self.get_board().get_en_passant_tile())
 
     def on_piece_clicked(self, event):
         file = event.x // self.square_size
@@ -95,13 +96,26 @@ class ChessGUI:
                 current_square = Coordinates(selected_index % 8, selected_index // 8)
                 destination_square = Coordinates(event.x // self.square_size, 7 - event.y // self.square_size)
 
-                move = Move(piece, current_square, destination_square)
-                
+                default_move = Move(piece, current_square, destination_square)
+
                 legal_moves = self.board.get_all_possible_moves(self.board.get_current_turn())
 
+                if default_move in legal_moves:
 
-                if move in legal_moves:
-                    self.get_board().move_piece(move)
+                    special_move = legal_moves[default_move]
+                    self.get_board().move_piece(special_move)
+
+                    # Handle removing the piece that was captured by en passant
+                    if special_move.get_is_en_passant():
+                        self.get_board().take_en_passant(special_move)
+
+                    # Check if the move was can be captured en passant
+                    if special_move.get_can_en_passant():
+                        en_passant_idx = special_move.get_en_passant_idx()
+                        if en_passant_idx is not None:
+                            self.get_board().set_en_passant_square(en_passant_idx)
+                    else:
+                        self.get_board().clear_en_passant_square()
 
                     # Redraw the board and reset the selected piece
                     self.canvas.delete(self.selected_piece_image)
