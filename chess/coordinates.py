@@ -29,3 +29,7 @@ class Coordinates:
         file = idx % 8
         rank = idx // 8
         return Coordinates(file, rank)
+    
+    # hash for coordinates
+    def __hash__(self):
+        return hash((self.file, self.rank))
