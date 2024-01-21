@@ -1,6 +1,8 @@
 """ pieces.py:
 This file contains the Piece class, which is used to represent chess pieces.
 """
+
+
 class Piece:
     # Piece types
     NONE = 0
@@ -21,7 +23,7 @@ class Piece:
 
     @staticmethod
     def get_piece_type(piece):
-        return piece & 7 
+        return piece & 7
 
     @staticmethod
     def get_color(piece):
@@ -38,6 +40,7 @@ class Piece:
         else:
             return piece_translation[piece_type]
 
+
 def convert_piece_to_string(piece):
     piece_type = Piece.get_piece_type(piece)
     color = Piece.get_color(piece)
@@ -49,12 +52,13 @@ def convert_piece_to_string(piece):
     else:
         return piece_translation[piece_type]
 
+
 piece_translation = {
-    Piece.KING: 'k',
-    Piece.PAWN: 'p',
-    Piece.KNIGHT: 'n',
-    Piece.BISHOP: 'b',
-    Piece.ROOK: 'r',
-    Piece.QUEEN: 'q',
-    Piece.NONE: '-',
+    Piece.KING: "k",
+    Piece.PAWN: "p",
+    Piece.KNIGHT: "n",
+    Piece.BISHOP: "b",
+    Piece.ROOK: "r",
+    Piece.QUEEN: "q",
+    Piece.NONE: "-",
 }
