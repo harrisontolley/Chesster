@@ -318,8 +318,15 @@ class Board:
 
                     if self.Square[destination_coords.get_board_index()] == Piece.NONE or Piece.get_color(self.Square[destination_coords.get_board_index()]) != color:
                         moves.append(Move(piece, current_coords, destination_coords))
+        
+        if self.can_castle_king_side(color):
+            if self.Square[current_coords.get_board_index() + 1] == Piece.NONE and self.Square[current_coords.get_board_index() + 2] == Piece.NONE:
+                moves.append(Move(piece, current_coords, Coordinates(current_file + 2, current_rank), is_castling=True))
+        
+        if self.can_castle_queen_side(color):
+            if self.Square[current_coords.get_board_index() - 1] == Piece.NONE and self.Square[current_coords.get_board_index() - 2] == Piece.NONE and self.Square[current_coords.get_board_index() - 3] == Piece.NONE:
+                moves.append(Move(piece, current_coords, Coordinates(current_file - 2, current_rank), is_castling=True))
         return moves
-
 
     def clear_en_passant_square(self):
         self.en_passant_square = '-'
@@ -389,3 +396,23 @@ class Board:
     
     def get_current_turn(self) -> int:
         return self.current_turn
+
+    def can_castle_king_side(self, color) -> bool:
+        if color == Piece.WHITE:
+            return 'K' in self.castling_availability
+        else:
+            return 'k' in self.castling_availability
+    
+    def can_castle_queen_side(self, color) -> bool:
+        if color == Piece.WHITE:
+            return 'Q' in self.castling_availability
+        else:
+            return 'q' in self.castling_availability
+    
+    def remove_castle_rights(self, color):
+        if color == Piece.WHITE:
+            self.castling_availability = self.castling_availability.replace('K', '')
+            self.castling_availability = self.castling_availability.replace('Q', '')
+        else:
+            self.castling_availability = self.castling_availability.replace('k', '')
+            self.castling_availability = self.castling_availability.replace('q', '')
