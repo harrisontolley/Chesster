@@ -10,8 +10,8 @@ class Move:
         self.current_coords = current_coords
         self.destination_coords = destination_coords
         self.can_en_passant = can_en_passant
-        self.get_is_castling = is_castling
-        self.get_is_promotion = is_promotion
+        self.is_castling = is_castling
+        self.is_promotion = is_promotion
         self.promotion_piece = promotion_piece
         self.is_en_passant = is_en_passant
 
@@ -73,3 +73,6 @@ class Move:
     
     def get_taken_piece_idx(self):
         return self.taken_piece_idx
+
+    def set_promotion_piece(self, piece):
+        self.promotion_piece = piece
