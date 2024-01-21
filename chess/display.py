@@ -88,7 +88,6 @@ class ChessGUI:
         if self.selected_piece_image is not None:
             self.canvas.coords(self.selected_piece_image, event.x, event.y)
 
-
     def on_piece_dropped(self, event):
             if self.selected_piece_image is not None and self.board.selected_piece is not None:
                 selected_index, piece = self.board.selected_piece
@@ -103,6 +102,7 @@ class ChessGUI:
                 if default_move in legal_moves:
 
                     special_move = legal_moves[default_move]
+
                     self.get_board().move_piece(special_move)
 
                     # Handle removing the piece that was captured by en passant
@@ -116,21 +116,65 @@ class ChessGUI:
                             self.get_board().set_en_passant_square(en_passant_idx)
                     else:
                         self.get_board().clear_en_passant_square()
+                    
+                    # Handle promotion
+                    if special_move.get_is_promotion():
+                        # prompt user for promotion piece type
+                        color = Piece.get_color(piece)
+                        chosen_piece = self.show_promotion_options(color)
+
+                        # set the promotion piece
+                        special_move.set_promotion_piece(chosen_piece)
+
+                        self.get_board().promote_piece(special_move)
 
                     # Redraw the board and reset the selected piece
                     self.canvas.delete(self.selected_piece_image)
 
-                    # self.selected_piece_image = None
-                    # self.board.selected_piece = None
-                    # self.draw_board()
                 else:
                     self.canvas.coords(self.selected_piece_image, event.x, event.y)
+
                 self.selected_piece_image = None
                 self.board.selected_piece = None
-                self.draw_board()
+                self.draw_board() # redraw board after move
 
     def get_board(self) -> Board:
         return self.board
+    
+    def show_promotion_options(self, color):
+        chosen_piece = None
+        while chosen_piece is None:
+            popup = tk.Toplevel(self.master)
+            popup.title("Pawn Promotion")
+            popup.geometry("200x100")
+            popup.grab_set()  # Makes the popup window modal
+
+            button_frame = tk.Frame(popup)
+            button_frame.pack(expand=True, fill="both")
+
+            def on_promotion_choice(piece_type):
+                nonlocal chosen_piece  # Refer to the outer variable
+                chosen_piece = Piece.create_piece(piece_type, color)
+                popup.destroy()
+
+            # Buttons for each promotion option
+            buttons = {
+                Piece.QUEEN: tk.Button(button_frame, text="Queen", command=lambda: on_promotion_choice(Piece.QUEEN)),
+                Piece.ROOK: tk.Button(button_frame, text="Rook", command=lambda: on_promotion_choice(Piece.ROOK)),
+                Piece.BISHOP: tk.Button(button_frame, text="Bishop", command=lambda: on_promotion_choice(Piece.BISHOP)),
+                Piece.KNIGHT: tk.Button(button_frame, text="Knight", command=lambda: on_promotion_choice(Piece.KNIGHT))
+            }
+
+            # Arrange buttons in the popup
+            for piece_type, button in buttons.items():
+                button.pack(side="left", expand=True)
+
+            self.master.wait_window(popup)  # Wait for the user to make a choice
+
+        return chosen_piece
+
+    def on_promotion_choice(self, piece_type, color):
+        self.promotion_choice = Piece.create_piece(piece_type, color)
 
 starting_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 # test = "8/8/8/3p2pp/8/8/8/B7  w KQkq - 0 1"

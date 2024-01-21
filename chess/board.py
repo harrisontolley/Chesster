@@ -126,7 +126,13 @@ class Board:
 
             if self.Square[pushed_coords.get_board_index()] == Piece.NONE:
                 single_push = Move(piece, current_coords, pushed_coords)
-                moves[single_push] = single_push
+                promotion_rank = 7 if color == Piece.WHITE else 0
+
+                if pushed_coords.get_rank() == promotion_rank:
+                    promotion_move = Move(piece, current_coords, pushed_coords, is_promotion=True)
+                    moves[single_push] = promotion_move
+                else:
+                    moves[single_push] = single_push
 
                 # Double move from starting position
                 starting_rank = 1 if color == Piece.WHITE else 6
@@ -151,10 +157,16 @@ class Board:
                 capture_index = capture_coords.get_board_index()
 
                 if self.Square[capture_index] != Piece.NONE and Piece.get_color(self.Square[capture_index]) != color:
-                    taken_piece_coords = Coordinates(capture_file, capture_rank)
 
-                    capture_move = Move(piece, current_coords, taken_piece_coords)
-                    moves[capture_move] = capture_move
+                    promotion_rank = 7 if color == Piece.WHITE else 0
+                    capture_move = Move(piece, current_coords, capture_coords)
+
+                    if capture_rank == promotion_rank:
+                        capture_promotion = Move(piece, current_coords, capture_coords, is_promotion=True)
+                        moves[capture_move] = capture_promotion
+                    else:
+                        moves[capture_move] = capture_move
+
 
         # En passant
         if self.en_passant_square != '-':
@@ -450,7 +462,8 @@ class Board:
 
     def take_en_passant(self, move: Move):
         if move.get_is_en_passant() and move.taken_piece_idx is not None:
-            print("TAKING EN PASSANT")
-            print(move.get_taken_piece_idx())
-            print(Board.convert_index_to_coordinates(move.get_taken_piece_idx()))
             self.Square[move.get_taken_piece_idx()] = Piece.NONE
+    
+    def promote_piece(self, move: Move):
+        if move.get_is_promotion():
+            self.Square[move.get_destination_coordinates().get_board_index()] = move.get_promotion_piece()
