@@ -28,12 +28,12 @@ class Board:
         rank = index // 8 + 1
         return f"{file}{rank}"
     
-    @staticmethod
-    def index_to_coordinates(index: int) -> Coordinates:
-        # ! WRONG DO NOT USE
-        file = index % 8
-        rank = index // 8 + 1
-        return Coordinates(file, rank)
+    # @staticmethod
+    # def index_to_coordinates(index: int) -> Coordinates:
+    #     # ! WRONG DO NOT USE
+    #     file = index % 8
+    #     rank = index // 8 + 1
+    #     return Coordinates(file, rank)
 
     def __str__(self):
         board_str = ""
@@ -110,7 +110,8 @@ class Board:
         elif piece_type == Piece.KING:
             return self.get_king_moves(piece, current_coords)
         return []
-    
+
+
     def get_pawn_moves(self, piece, current_coords: Coordinates) -> list[Move]:
         moves = []
         color = Piece.get_color(piece)
@@ -133,7 +134,8 @@ class Board:
                     double_pushed_coords = Coordinates(current_coords.get_file(), current_coords.get_rank() + 2 * direction)
 
                     if self.Square[double_pushed_coords.get_board_index()] == Piece.NONE:
-                        moves.append(Move(piece, current_coords, double_pushed_coords))
+                        moves.append(Move(piece, current_coords, double_pushed_coords, can_en_passant=True))
+                        print(Move(piece, current_coords, double_pushed_coords, can_en_passant=True))
 
         # Captures
         for offset in [-1, 1]:
@@ -152,6 +154,9 @@ class Board:
         # En passant
         if self.en_passant_square != '-':
 
+            print("CAN EN PASSANT")
+            print(self.en_passant_square)
+
             en_passant_index = self.square_to_index(self.get_en_passant_tile())
 
             en_passant_coordinates = self.index_to_coordinates(en_passant_index)
@@ -161,11 +166,6 @@ class Board:
                 if taking_coordinates == en_passant_coordinates:
                     moves.append(en_passant_coordinates)
                     break
-
-            # en_passant_rank, en_passant_file = 7 - self.square_to_index(self.en_passant_square) // 8, self.square_to_index(self.en_passant_square) % 8
-
-            # if rank == en_passant_rank and abs(file - en_passant_file) == 1:
-            #     moves.append((en_passant_rank + direction, en_passant_file))
 
         return moves
 
@@ -359,6 +359,11 @@ class Board:
         en_passant_square = parts[3]
         halfmove_clock = parts[4]
         fullmove_number = parts[5]
+
+        board.castling_availability = castling_availability
+        board.en_passant_square = en_passant_square
+        board.halfmove_clock = halfmove_clock
+        board.fullmove_number = fullmove_number
 
         rank, file = 7, 0  # Start from the top-left corner of the board
         for char in piece_placement:
