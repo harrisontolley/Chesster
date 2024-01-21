@@ -16,7 +16,6 @@ class Move:
 
         self.en_passant_idx = None
         if self.get_can_en_passant():
-            print("over here")
             self.en_passant_idx = Coordinates(self.destination_coords.get_file(), self.current_coords.get_rank() + 1 if Piece.get_color(piece) == Piece.WHITE else self.current_coords.get_rank() - 1).get_board_index()
 
     def __str__(self):
