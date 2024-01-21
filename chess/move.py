@@ -5,7 +5,7 @@ from pieces import *
 from coordinates import Coordinates
 
 class Move:
-    def __init__(self, piece: Piece, current_coords: Coordinates, destination_coords: Coordinates, can_en_passant=False, is_castling=False, is_promotion=False, promotion_piece=Piece.NONE):
+    def __init__(self, piece: Piece, current_coords: Coordinates, destination_coords: Coordinates, can_en_passant=False, is_castling=False, is_promotion=False, promotion_piece=Piece.NONE, is_en_passant=False):
         self.piece = piece
         self.current_coords = current_coords
         self.destination_coords = destination_coords
@@ -13,10 +13,17 @@ class Move:
         self.get_is_castling = is_castling
         self.get_is_promotion = is_promotion
         self.promotion_piece = promotion_piece
+        self.is_en_passant = is_en_passant
 
         self.en_passant_idx = None
         if self.get_can_en_passant():
             self.en_passant_idx = Coordinates(self.destination_coords.get_file(), self.current_coords.get_rank() + 1 if Piece.get_color(piece) == Piece.WHITE else self.current_coords.get_rank() - 1).get_board_index()
+
+        if self.get_is_en_passant():
+            self.taken_piece_idx = Coordinates(self.destination_coords.get_file(), self.current_coords.get_rank()).get_board_index()
+            # self.taken_piece_idx = Coordinates(self.destination_coords.get_file(), self.current_coords.get_rank() - 1 if Piece.get_color(piece) == Piece.WHITE else self.current_coords.get_rank() + 1).get_board_index()
+        else:
+            self.taken_piece_idx = None
 
     def __str__(self):
         return f"{convert_piece_to_string(self.piece)} from {self.current_coords} to {self.destination_coords}"
@@ -53,3 +60,16 @@ class Move:
     
     def get_en_passant_idx(self):
         return self.en_passant_idx
+    
+    # hash function for Move class
+    def __hash__(self):
+        return hash((self.piece, self.current_coords, self.destination_coords))
+    
+    def get_is_en_passant(self):
+        return self.is_en_passant
+    
+    def get_en_passanted_piece_idx(self):
+        return self.en_passanted_piece_idx
+    
+    def get_taken_piece_idx(self):
+        return self.taken_piece_idx
